@@ -4,6 +4,7 @@ type t = {
 }
 
 let init x = 
+  (* let b = *)
   failwith "Unimplemented"
 
 let print_board t = 
