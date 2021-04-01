@@ -1,6 +1,6 @@
-type t = {
+type board = {
   dim : int;
-  board : string list;
+  board_letters : string list;
 }
 
 let init x = 
