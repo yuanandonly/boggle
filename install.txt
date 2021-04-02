@@ -1,2 +1,6 @@
-to install the system, download the zip file called "src.zip" 
-from CMS. 
+To install the system, download the zip file called "src.zip" 
+from CMS. The system was constructed with the basic version of 
+OCaml initially installed for this class, so downloading any 
+additional packages. 
+The system can be tested by importing files into UTOP. 
+ex: "#use ..." From there, 
