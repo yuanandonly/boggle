@@ -105,7 +105,7 @@ end
 
 (* tests *)
 
-module Test = Trie_func;;
+(* module Test = Trie_func;; *)
 (* let test_inserting let test = Test.empty ();; *)
 
 

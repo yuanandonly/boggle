@@ -1,5 +1,6 @@
 open Str
 open Board
+open Trie
 
 let corpus =  "corpus.txt"
 (** Converts [corpus.txt] into a readable string *)
@@ -16,9 +17,10 @@ let listed_strings = String.split_on_char (' ') string_space
 (** Filters all empty space from the list *)
 let filtered_list = List.filter (fun x -> String.length x > 0) listed_strings
 
+module Trie_module = Trie.Trie_func
+let word_trie = Trie_module.trie_instantiate filtered_list
 
-
-
+(* 
 let find_possible_words (input_board : Board.board) (word_list : string list)
   : string list = 
-  failwith "Unimplemented"
+  failwith "Unimplemented" *)
