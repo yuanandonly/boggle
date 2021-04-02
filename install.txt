@@ -1,6 +1,11 @@
 To install the system, download the zip file called "src.zip" 
 from CMS. The system was constructed with the basic version of 
 OCaml initially installed for this class, so downloading any 
-additional packages. 
+additional OPAM packages won't be needed. 
 The system can be tested by importing files into UTOP. 
-ex: "#use ..." From there, 
+ex: "#use ..." For this sprint, all of our functions are contained in main.ml, 
+so the only command needed is “#use ‘main.ml’;;”. However, before that, you 
+need to run “#load ‘str.cma’;;” to be able to use the Str module.
+
+To run our code, first run “ocamlc -c main.mli” in the terminal to produce 
+the *.cmi files. Next, run “ocamlc str.cma main.ml” to include the Str module.

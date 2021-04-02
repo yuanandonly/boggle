@@ -89,10 +89,24 @@ module Trie_func  = struct
 
   (* checks if input [key] is an actual word inside of the provided trie. 
     returns boolean*)
-  let rec trie_contains (trie : t) (key : string list) : bool = 
+  let rec trie_contains_word (trie : t) (key : string list) : bool = 
     let Node(is_word, children) = trie in
     match key with
     | [] -> is_word
+    | stem::rest -> let matching_child = extract_t_option 
+        (return_child_opt children stem) in
+      if matching_child = empty () 
+      then (* not child has stem, doesnt contain*)
+        false
+      else (*child does contain stem, rec call again*)
+      trie_contains_word matching_child rest
+
+  (* checks if input [key] is an actual node inside of the provided trie. [key]
+    DOES NOT HAVE TO BE A WORD. returns boolean*)      
+  let rec trie_contains (trie : t) (key : string list) : bool = 
+    let Node(is_word, children) = trie in
+    match key with
+    | [] -> true
     | stem::rest -> let matching_child = extract_t_option 
         (return_child_opt children stem) in
       if matching_child = empty () 
