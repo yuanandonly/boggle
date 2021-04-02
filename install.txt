@@ -1,0 +1,2 @@
+to install the system, download the zip file called "src.zip" 
+from CMS. 
