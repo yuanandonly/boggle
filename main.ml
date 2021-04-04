@@ -197,7 +197,7 @@ let rec fold_custom (curr_word : string) (board_loc : int) (input_board : board)
   match adj_ind with
   | [] -> found
   | h::t -> if List.mem h visited
-    then (* immediately go onto next adj ind*)
+    then (* no new words, immediately go onto next adj ind*)
       fold_custom curr_word board_loc input_board visited found t
     else (* check if new word is in trie and if word, add*)
       let tile = List.nth input_board.board_letters h in
@@ -208,13 +208,18 @@ let rec fold_custom (curr_word : string) (board_loc : int) (input_board : board)
               if Trie_module.trie_contains_word word_trie 
                 (Trie_module.word_to_list new_word)
                 then
-                  find_helper new_word h input_board (new_word :: found)
-                    (h :: visited)
+                  (find_helper new_word h input_board (new_word :: found)
+                      (h :: visited) @ 
+                  fold_custom curr_word board_loc input_board visited found t)
                 else
-                  find_helper new_word h input_board found
-                    (h :: visited)
+                  (find_helper new_word h input_board found
+                      (h :: visited) @ 
+                  fold_custom curr_word board_loc input_board visited found t)
             else
               fold_custom curr_word board_loc input_board visited found t
+
+
+(* TODO lookup table for letters <=> indices of board instead of passing *)
 
 
 and find_helper (curr_word : string) (board_loc : int) (input_board : board) 
@@ -228,9 +233,10 @@ let rec fold_left_ind f (accu : string list) (l : string list) (ind : int) =
   | a::l -> fold_left_ind f (f accu a ind) l (ind+1)
 
 let find_possible_words (input_board : board) : string list = 
-  fold_left_ind (fun accu a ind -> 
+  let with_duplicates = fold_left_ind (fun accu a ind -> 
       accu @ (find_helper a ind input_board [] [ind])) [] 
-      input_board.board_letters 0
+      input_board.board_letters 0 in
+  List.sort_uniq compare with_duplicates
 
 let ex_board = {dim = 4; board_letters = 
     ["A";"B";"C";"D";"E";"F";"G";"H";"I";"J";"K";"L";"M";"N";"O";"P"]}
