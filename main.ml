@@ -44,49 +44,47 @@ let init x =
   print_loop 0
 (* ********************************************************************** *)
 module Trie_func  = struct
+  (* the type of trie node: a pair of a boolean representing whether the node
+  in the trie represents a word, and a list of pairs. Each element is a list is
+  a pair of a string of a character and the child node that represents the new
+  word formed with that character. *)
   type t = Node of bool * (string * t) list
 
+  (* empty trie *)
   let empty () = Node(false, [])
 
+  (* extracts the data type [string * t] from the option, returns empty pair
+    if the option is none *)
   let extract_st_option (o : (string * t) option) = 
     match o with
     | Some i -> i
     | None -> (" ", empty ())
 
+  (* extracts the data type [t] from the option, returns empty trie
+    if the option is none *) 
     let extract_t_option (o : t option) = 
       match o with
       | Some i -> i
       | None -> empty ()
 
-  (* check if a child with a certain word stem exists in the list of children
-    and returns an option of that trie [t]. Some [t] if it exists, None else. *)
+  (* splitting a given string [input] into a list of letters of that word. 
+   No such String function does this, String.split_on_char needs a character
+        with which to split*)          
+        let word_to_list (input : string) : string list =
+          let rec iterate ct acc = 
+            if ct >= String.length input then acc 
+                else iterate (ct + 1) (acc @ [Char.escaped input.[ct]])
+          in iterate 0 []
+      
+  (* check if a child with a certain character stem exists in the list of 
+    children of type (string * t) list, and returns an option of that trie. *)
   let return_child_opt (children : (string * t) list) (stem : string) : 
       t option = 
     let compare_char stem (pair : (string * t)) : bool = (fst pair = stem) in
       let result = List.find_opt (compare_char stem) children in
         if result = None then None else Some (snd (extract_st_option result))
 
-  (* let rec find_node (trie : t) (key : string list) : t option =
-    match key with
-    | words_containing -> Some trie
-    | [] -> None
-    | _ -> let result = return_child_opt d key.[0] in
-        if result = None then None else 
-          find_node (extract_t_option result) 
-            (String.sub key 1 (String.length key - 1)) *)
-
-  (* splitting a given string [input] into a list of letters of that word. 
-   No such String function does this, String.split_on_char needs a character
-        with which to split*)          
-  let word_to_list (input : string) : string list =
-    let rec iterate ct acc = 
-      if ct >= String.length input then acc 
-          else iterate (ct + 1) (acc @ [Char.escaped input.[ct]])
-    in iterate 0 []
-
-
-
-  (* adds a new word to the tire. Takes in current trie and word. 
+  (* adds a new word to the trie. Takes in current trie and word. 
   returns a new trie with the new word added. If the word node exists in the
   trie but is not marked as a word, then returns a trie with that word marked as
   a word.*)
@@ -110,15 +108,9 @@ module Trie_func  = struct
           ((fun (a,b) -> a <> stem)) children in
           let new_child = trie_insert (Node(c_is_word, c_children)) rest in
             Node(is_word, non_matching_children @ [(stem, new_child)])
-  
-  let trie_instantiate (words : string list) : t = 
-    List.fold_left (fun acc (word : string) 
-        -> trie_insert acc (word_to_list word)) 
-        (empty ()) words 
-                
 
   (* checks if input [key] is an actual word inside of the provided trie. 
-    returns boolean*)
+    returns boolean *)
   let rec trie_contains_word (trie : t) (key : string list) : bool = 
     let Node(is_word, children) = trie in
     match key with
@@ -132,7 +124,7 @@ module Trie_func  = struct
       trie_contains_word matching_child rest
 
   (* checks if input [key] is an actual node inside of the provided trie. [key]
-    DOES NOT HAVE TO BE A WORD. returns boolean*)      
+    does not have to be a word! returns boolean *)      
   let rec trie_contains (trie : t) (key : string list) : bool = 
     let Node(is_word, children) = trie in
     match key with
@@ -144,6 +136,12 @@ module Trie_func  = struct
         false
       else (*child does contain stem, rec call again*)
         trie_contains matching_child rest
+  
+  (* creates a new trie and populates it with everything in the string list *)
+  let trie_instantiate (words : string list) : t = 
+    List.fold_left (fun acc (word : string) 
+        -> trie_insert acc (word_to_list word)) 
+        (empty ()) words       
 
 end
 
@@ -152,7 +150,6 @@ end
 (* module Test = Trie_func;; *)
 (* let test_inserting let test = Test.empty ();; *)
 (* ********************************************************************** *)
-
 
 let corpus =  "corpus.txt"
 (** Converts [corpus.txt] into a readable string *)
@@ -169,9 +166,15 @@ let listed_strings = String.split_on_char (' ') string_space
 (** Filters all empty space from the list *)
 let filtered_list = List.filter (fun x -> String.length x > 0) listed_strings
 
+
+(* implements the Trie_func module *)
 module Trie_module = Trie_func
+
+(* creates a trie with all the words in our corpus *)
 let word_trie = Trie_module.trie_instantiate filtered_list
 
+(* Array of the adjacent tiles of each tile in a 4x4 board, position of tile 
+  corresponds to the index. *)
 let adjacent_tiles = 
   [|
     [1;5;4] ;
@@ -192,8 +195,15 @@ let adjacent_tiles =
     [10;11;14]
   |]
 
+(* Recursive component of the Boggle DFS algorithm. Modified version of the 
+  List.fold_left function that folds through adjacent tiles to the current tile,
+  accumulating all the found words together. For each of the adjacent tiles,
+  the function checks if the new word formed with adjacent letter exists in
+  the trie, if it is a valid word, and calls find_helper to recur deeper
+  to find more words accordingly. Returns a list of all found strings *)
 let rec fold_custom (curr_word : string) (board_loc : int) (input_board : board) 
-  (visited : int list) (found : string list) (adj_ind : int list): string list =
+      (visited : int list) (found : string list) (adj_ind : int list) 
+      : string list =
   match adj_ind with
   | [] -> found
   | h::t -> if List.mem h visited
@@ -218,25 +228,32 @@ let rec fold_custom (curr_word : string) (board_loc : int) (input_board : board)
             else
               fold_custom curr_word board_loc input_board visited found t
 
-
-(* TODO lookup table for letters <=> indices of board instead of passing *)
-
-
+(* helper function in the Boggle DFS algorithm. Given a tile location in a 
+  boggle board, calls the fold_custom recursive functions and passes in the 
+  adjacent tiles. *)
 and find_helper (curr_word : string) (board_loc : int) (input_board : board) 
     (found : string list) (visited : int list) : string list = 
   let adjacent_indices = Array.get adjacent_tiles board_loc in
     fold_custom curr_word board_loc input_board visited found adjacent_indices
-       
+
+(* a modified version List.fold_left that also passes along the index [ind]
+  of the current head of in the original starting list [l]. Sort of like an
+  incrementing counter in a for loop *)
 let rec fold_left_ind f (accu : string list) (l : string list) (ind : int) =
   match l with
     [] -> accu
   | a::l -> fold_left_ind f (f accu a ind) l (ind+1)
 
+(* finds all possible words that exist inside a given Boggle board. Returns a
+string list of unique words. *)
 let find_possible_words (input_board : board) : string list = 
   let with_duplicates = fold_left_ind (fun accu a ind -> 
       accu @ (find_helper a ind input_board [] [ind])) [] 
       input_board.board_letters 0 in
   List.sort_uniq compare with_duplicates
+
+(* TODO lookup table for letters <=> indices of board instead of passing *)
+
 
 let ex_board = {dim = 4; board_letters = 
     ["A";"B";"C";"D";"E";"F";"G";"H";"I";"J";"K";"L";"M";"N";"O";"P"]}
