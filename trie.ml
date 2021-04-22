@@ -12,7 +12,7 @@ module Trie = struct
   }
 end *)
 
-module Trie_func  = struct
+module Trie_func = struct
   (* the type of trie node: a pair of a boolean representing whether the node
   in the trie represents a word, and a list of pairs. Each element is a list is
   a pair of a string of a character and the child node that represents the new
@@ -24,26 +24,26 @@ module Trie_func  = struct
 
   (* extracts the data type [string * t] from the option, returns empty pair
     if the option is none *)
-  let extract_st_option (o : (string * t) option) = 
+  let extract_st_option (o : (string * t) option) : (string * t) = 
     match o with
     | Some i -> i
     | None -> (" ", empty ())
 
   (* extracts the data type [t] from the option, returns empty trie
     if the option is none *) 
-    let extract_t_option (o : t option) = 
-      match o with
-      | Some i -> i
-      | None -> empty ()
+  let extract_t_option (o : t option) : t = 
+    match o with
+    | Some i -> i
+    | None -> empty ()
 
   (* splitting a given string [input] into a list of letters of that word. 
    No such String function does this, String.split_on_char needs a character
         with which to split*)          
-        let word_to_list (input : string) : string list =
-          let rec iterate ct acc = 
-            if ct >= String.length input then acc 
-                else iterate (ct + 1) (acc @ [Char.escaped input.[ct]])
-          in iterate 0 []
+  let word_to_list (input : string) : string list =
+    let rec iterate ct acc = 
+      if ct >= String.length input then acc 
+          else iterate (ct + 1) (acc @ [Char.escaped input.[ct]])
+    in iterate 0 []
       
   (* check if a child with a certain character stem exists in the list of 
     children of type (string * t) list, and returns an option of that trie. *)

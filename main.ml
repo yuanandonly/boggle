@@ -154,7 +154,7 @@ end
 
 let corpus =  "corpus.txt"
 (** Converts [corpus.txt] into a readable string *)
-let read_whole_file filename =
+let read_whole_file (filename : string) =
   let ch = open_in filename in
   let s = really_input_string ch (in_channel_length ch) in
   close_in ch;
@@ -168,14 +168,10 @@ let listed_strings = String.split_on_char (' ') string_space
 let filtered_list = List.filter (fun x -> String.length x > 0) listed_strings
 
 
-(* implements the Trie_func module *)
 module Trie_module = Trie_func
 
-(* creates a trie with all the words in our corpus *)
 let word_trie = Trie_module.trie_instantiate filtered_list
 
-(* Array of the adjacent tiles of each tile in a 4x4 board, position of tile 
-  corresponds to the index. *)
 let adjacent_tiles = 
   [|
     [1;5;4] ;
@@ -196,12 +192,6 @@ let adjacent_tiles =
     [10;11;14]
   |]
 
-(* Recursive component of the Boggle DFS algorithm. Modified version of the 
-  List.fold_left function that folds through adjacent tiles to the current tile,
-  accumulating all the found words together. For each of the adjacent tiles,
-  the function checks if the new word formed with adjacent letter exists in
-  the trie, if it is a valid word, and calls find_helper to recur deeper
-  to find more words accordingly. Returns a list of all found strings *)
 let rec fold_custom (curr_word : string) (board_loc : int) (input_board : board) 
       (visited : int list) (found : string list) (adj_ind : int list) 
       : string list =
@@ -229,24 +219,17 @@ let rec fold_custom (curr_word : string) (board_loc : int) (input_board : board)
             else
               fold_custom curr_word board_loc input_board visited found t
 
-(* helper function in the Boggle DFS algorithm. Given a tile location in a 
-  boggle board, calls the fold_custom recursive functions and passes in the 
-  adjacent tiles. *)
 and find_helper (curr_word : string) (board_loc : int) (input_board : board) 
     (found : string list) (visited : int list) : string list = 
   let adjacent_indices = Array.get adjacent_tiles board_loc in
     fold_custom curr_word board_loc input_board visited found adjacent_indices
 
-(* a modified version List.fold_left that also passes along the index [ind]
-  of the current head of in the original starting list [l]. Sort of like an
-  incrementing counter in a for loop *)
-let rec fold_left_ind f (accu : string list) (l : string list) (ind : int) =
+let rec fold_left_ind (f : (string list -> string -> int -> string list)) 
+  (accu : string list) (l : string list) (ind : int) : string list =
   match l with
     [] -> accu
   | a::l -> fold_left_ind f (f accu a ind) l (ind+1)
 
-(* finds all possible words that exist inside a given Boggle board. Returns a
-string list of unique words. *)
 let find_possible_words (input_board : board) : string list = 
   (* let adjacencies = Board.adj_table input_board.dim in*)
   let with_duplicates = fold_left_ind (fun accu a ind -> 
