@@ -53,13 +53,6 @@ let adj_table (x : int) : int list array =
   done;
   arr
 
-
-    
-
-  
-
-
-
 (** Requires: t.dim > 0 *)
   let print_board t = 
     (* frame_loop used to generate strings for the frame *)
