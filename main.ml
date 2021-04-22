@@ -82,7 +82,8 @@ module Trie_func  = struct
       t option = 
     let compare_char stem (pair : (string * t)) : bool = (fst pair = stem) in
       let result = List.find_opt (compare_char stem) children in
-        if result = None then None else Some (snd (extract_st_option result))
+        if result = None 
+          then None else Some (snd (extract_st_option result))
 
   (* adds a new word to the trie. Takes in current trie and word. 
   returns a new trie with the new word added. If the word node exists in the
@@ -247,6 +248,7 @@ let rec fold_left_ind f (accu : string list) (l : string list) (ind : int) =
 (* finds all possible words that exist inside a given Boggle board. Returns a
 string list of unique words. *)
 let find_possible_words (input_board : board) : string list = 
+  (* let adjacencies = Board.adj_table input_board.dim in*)
   let with_duplicates = fold_left_ind (fun accu a ind -> 
       accu @ (find_helper a ind input_board [] [ind])) [] 
       input_board.board_letters 0 in
