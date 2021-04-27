@@ -3,14 +3,69 @@ type board = {
   board_letters : string list;
 }
 
-let init x =
+type die = { letters : string list }
+
+let roll (d : die) : string = List.nth d.letters (Random.int 6)
+
+let die_letters4 =
+  "AACIOTAHMORSEGKLUYABILITYACDEMPEGINTVGILRUWELPSTUDENOSWACELRSABJMOQEEFHIYEHINPSDKNOTUADENVZBIFORZ"
+
+let die_init int =
+  {
+    letters =
+      [
+        Char.escaped die_letters4.[0 + (4 * int)];
+        Char.escaped die_letters4.[1 + (4 * int)];
+        Char.escaped die_letters4.[2 + (4 * int)];
+        Char.escaped die_letters4.[3 + (4 * int)];
+      ];
+  }
+
+let rec dice4_helper (acc : die list) (die_num : int) : die list =
+  if die_num < 0 then acc
+  else dice4_helper (die_init die_num :: acc) (die_num - 1)
+
+let dice4 = dice4_helper [] 15
+
+let rec rand_die_helper (acc : int list) (count : int) =
+  if count < 0 then acc
+  else
+    let rec find_num x =
+      if List.mem x acc then x else find_num ((x + 1) mod 16)
+    in
+    rand_die_helper ((16 |> Random.int |> find_num) :: acc) (count - 1)
+
+let init4 =
+  let rand4 = rand_die_helper [] 15 in
+  let rec init4_helper (acc : string list) (count : int) : string list =
+    match count with
+    | -1 -> acc
+    | x ->
+        init4_helper
+          ((count |> List.nth rand4 |> List.nth dice4 |> roll) :: acc)
+          (count - 1)
+  in
+  { dim = 4; board_letters = init4_helper [] 15 }
+
+let manual_init (size : int) (letters : string) : board =
+  if String.length letters - 1 <> size * size then
+    failwith "invalid board"
+  else
+    let rec split (s : string) (acc : string list) =
+      match String.length s with
+      | 1 -> List.rev_append acc [ s ]
+      | _ -> Char.escaped s.[0] :: acc
+    in
+    { dim = size; board_letters = split letters [] }
+
+let rand_init (size : int) =
   let rand_chr () =
     26 |> Random.int |> ( + ) 65 |> Char.chr |> Char.escaped
   in
   let rec loop i acc =
-    if i = x * x then acc else loop (i + 1) (rand_chr () :: acc)
+    if i = size * size then acc else loop (i + 1) (rand_chr () :: acc)
   in
-  { dim = x; board_letters = loop 0 [] }
+  { dim = size; board_letters = loop 0 [] }
 
 let direc_list (x : int) : (int * int) list =
   [
