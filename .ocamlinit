@@ -1,0 +1,4 @@
+#directory "_build";;
+#load_rec "board.cmo";;
+#load_rec "main.cmo";;
+#load_rec "trie.cmo";;

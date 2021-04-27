@@ -1,0 +1,8 @@
+### Starting build.
+# Target: test.ml.depends, tags: { package(ounit2), package(qcheck), package(str), package(unix), debug, extension:ml, file:test.ml, ocaml, ocamldep, quiet, traverse }
+ocamlfind ocamldep -package unix -package ounit2 -package qcheck -package str -modules test.ml > test.ml.depends # cached
+# Target: test.cmo, tags: { package(ounit2), package(qcheck), package(str), package(unix), byte, compile, debug, extension:cmo, extension:ml, file:test.cmo, file:test.ml, implem, ocaml, quiet, traverse }
+ocamlfind ocamlc -c -g -package unix -package ounit2 -package qcheck -package str -o test.cmo test.ml # cached
+# Target: test.byte, tags: { package(ounit2), package(qcheck), package(str), package(unix), byte, debug, dont_link_with, extension:byte, file:test.byte, link, ocaml, program, quiet, traverse }
+ocamlfind ocamlc -linkpkg -g -package unix -package ounit2 -package qcheck -package str test.cmo -o test.byte # cached
+# Compilation successful.
