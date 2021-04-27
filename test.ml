@@ -1,4 +1,7 @@
 open OUnit2
+open Main
+open Board
+open Trie
 
 let suite = "search test suite" >::: []
 
