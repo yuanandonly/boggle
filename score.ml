@@ -11,7 +11,7 @@
    based on word length: <3: 0 3: 100 4: 400 5: 800 6+: 400*length -
    1000 (i.e. 6 is 1400 and add 400 after for each letter)*)
 
-let score_helper (acc : int) (word : string) : int =
+let wordhunt_scoring_helper (acc : int) (word : string) : int =
   acc
   +
   match String.length word with
@@ -20,8 +20,11 @@ let score_helper (acc : int) (word : string) : int =
   | 5 -> 800
   | x -> if x < 3 then 0 else (x * 400) - 1000
 
-let score_singleplayer (words : string list) : int =
-  List.fold_left score_helper 0 words
+let wordhunt_scoring_single (words : string list) : int =
+  List.fold_left wordhunt_scoring_helper 0 words
+
+let wordhunt_scoring_multi (word_sets : string list list) : int list =
+  List.map wordhunt_scoring_single word_sets
 
 (* 2. legal boggle game rules following boggle testing
    https://www.fgbradleys.com/rules/Boggle.pdf
@@ -34,8 +37,23 @@ let score_singleplayer (words : string list) : int =
    make a frequency map of every input word. then for each player go
    thru their word list and if a word has frequency 1 (i.e only that
    player submitted it), then give them credit. *)
+let boggle_scoring_helper (acc : int) (word : string) : int =
+  acc
+  +
+  match String.length word with
+  | 3 -> 1
+  | 4 -> 1
+  | 5 -> 2
+  | 6 -> 3
+  | 7 -> 5
+  | x -> if x < 3 then 0 else 11
 
 module StringMap = Map.Make (String)
+
+(** boggle_scoring_single lst is the boggle score for a list `lst` of
+    player words playing on their own *)
+let boggle_scoring_single (words : string list) : int =
+  List.fold_left boggle_scoring_helper 0 words
 
 (* freqmap_word_helper adds a word to the frequency map (acc) *)
 let freqmap_word_helper (acc : int StringMap.t) (word : string) :
@@ -50,7 +68,10 @@ let freqmap_list_helper
     (player_word_list : string list) : int StringMap.t =
   List.fold_left freqmap_word_helper acc player_word_list
 
-let score_boggle (word_sets : string list list) : int list =
+(** boggle_scoring_multi word_lsts is a list of integers representing
+    the boggle scores corresponding to each player's found words in
+    string list list word_lsts *)
+let boggle_scoring_multi (word_sets : string list list) : int list =
   (* create frequency map*)
   let freqmap =
     List.fold_left freqmap_list_helper StringMap.empty word_sets
@@ -61,7 +82,7 @@ let score_boggle (word_sets : string list list) : int list =
     acc
     +
     match StringMap.find word freqmap with
-    | 1 -> score_helper 0 word
+    | 1 -> boggle_scoring_helper 0 word
     | _ -> 0
   in
   (* comparer uses comparer_helper on a list of words, returning the
