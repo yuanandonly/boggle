@@ -1,4 +1,4 @@
-MODULES=board score trie main authors
+MODULES=board score trie words authors main art
 OBJECTS=$(MODULES:=.cmo)
 MLS=$(MODULES:=.ml)
 MLIS=$(MODULES:=.mli)
