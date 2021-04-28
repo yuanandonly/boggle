@@ -30,7 +30,9 @@ let main () =
   ANSITerminal.(print_string [green; Blink] 
   "\n>> ");
   let board_size = 
-    let input = read_line () |> int_of_string_opt in
+    let input = 
+      read_line () 
+      |> int_of_string_opt in
     match input with
     | None -> (ANSITerminal.(print_string [red; Bold] 
     "Invalid input. Ending game...\n"); exit 0)
