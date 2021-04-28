@@ -5,47 +5,72 @@ type board = {
 
 type die = { letters : string list }
 
-let roll (d : die) : string = List.nth d.letters (Random.int 6)
+let _ = Random.self_init
+(* should make it so you never get the same board but right now it looks
+   like every first time I initialize this file and create a 4x4 classic
+   board I get the same letters*)
+
+let roll (d : die) : string =
+  let face = Random.int 6 in
+  List.nth d.letters face
 
 let die_letters4 =
   "AACIOTAHMORSEGKLUYABILITYACDEMPEGINTVGILRUWELPSTUDENOSWACELRSABJMOQEEFHIYEHINPSDKNOTUADENVZBIFORZ"
 
-let die_init int =
-  {
-    letters =
-      [
-        Char.escaped die_letters4.[0 + (4 * int)];
-        Char.escaped die_letters4.[1 + (4 * int)];
-        Char.escaped die_letters4.[2 + (4 * int)];
-        Char.escaped die_letters4.[3 + (4 * int)];
-      ];
-  }
+let die_letters5 =
+  "QBZJXKTOUOTOOVWRGRAAAFSRAUMEEGHHLRDONHDTHOLHNRODAFAISRYIFASRTELPCISSNSEURIYPRHDORDLNCCWNSTTTOTEMSCTIEPEANDNNMNNEAGUOTOWNAEAEEEYIFPSREEEEMAITITIEETILIC"
 
-let rec dice4_helper (acc : die list) (die_num : int) : die list =
-  if die_num < 0 then acc
-  else dice4_helper (die_init die_num :: acc) (die_num - 1)
+let q_convert (letter : string) : string =
+  if letter = "Q" then "Qu" else letter
 
-let dice4 = dice4_helper [] 15
-
-let rec rand_die_helper (acc : int list) (count : int) =
-  if count < 0 then acc
-  else
-    let rec find_num x =
-      if List.mem x acc then x else find_num ((x + 1) mod 16)
-    in
-    rand_die_helper ((16 |> Random.int |> find_num) :: acc) (count - 1)
-
-let init4 =
-  let rand4 = rand_die_helper [] 15 in
-  let rec init4_helper (acc : string list) (count : int) : string list =
+let die_init (die_num : int) (dim : int) : die =
+  let die_letters = if dim = 4 then die_letters4 else die_letters5 in
+  let rec die_init_helper (acc : string list) (count : int) :
+      string list =
     match count with
     | -1 -> acc
     | x ->
-        init4_helper
-          ((count |> List.nth rand4 |> List.nth dice4 |> roll) :: acc)
+        die_init_helper
+          (q_convert (Char.escaped die_letters.[count + (6 * die_num)])
+           :: acc)
           (count - 1)
   in
-  { dim = 4; board_letters = init4_helper [] 15 }
+  { letters = die_init_helper [] 5 }
+
+let rec dice_helper (acc : die list) (die_num : int) (dim : int) :
+    die list =
+  if die_num < 0 then acc
+  else dice_helper (die_init die_num dim :: acc) (die_num - 1) dim
+
+let dice4 = dice_helper [] 15 4
+
+let dice5 = dice_helper [] 24 5
+
+let rec dice_randomizer (acc : int list) (count : int) (dim : int) =
+  if count < 0 then acc
+  else
+    let rec find_num x =
+      if not (List.mem x acc) then x
+      else find_num ((x + 1) mod (dim * dim))
+    in
+    dice_randomizer
+      ((dim * dim |> Random.int |> find_num) :: acc)
+      (count - 1) dim
+
+let init_classic (dim : int) =
+  let dice_loc = dice_randomizer [] ((dim * dim) - 1) dim in
+  let rec init_helper (acc : string list) (count : int) : string list =
+    match count with
+    | -1 -> acc
+    | x ->
+        let letter =
+          count |> List.nth dice_loc
+          |> List.nth (if dim = 4 then dice4 else dice5)
+          |> roll
+        in
+        init_helper (letter :: acc) (count - 1)
+  in
+  { dim; board_letters = init_helper [] ((dim * dim) - 1) }
 
 let manual_init (size : int) (letters : string) : board =
   if String.length letters - 1 <> size * size then
@@ -117,8 +142,9 @@ let print_board t =
   let rec letter_loop start i acc =
     if i = t.dim then acc ^ "|"
     else
+      let letter = List.nth t.board_letters (start + i) in
       letter_loop start (i + 1)
-        (acc ^ "| " ^ List.nth t.board_letters (start + i) ^ " ")
+        (acc ^ "| " ^ letter ^ if letter = "Qu" then "" else " ")
   in
   let top1 = " " ^ String.make ((t.dim * 4) - 1) '_' in
   let top2 = frame_loop "|   " 0 "" in

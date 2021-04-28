@@ -21,9 +21,9 @@ val manual_init : int -> string -> board
     having an equal chance to appear on every square.*)
 val rand_init : int -> board
 
-(** [init4] is a randomized 4x4 classic boggle board implemented with
-    dice *)
-val init4 : board
+(** [init_classic i] is a randomized classic boggle board of size 4 or 5
+    represented by [i] and implemented with dice *)
+val init_classic : int -> board
 
 (* for a pair (a, b) in the assoc list, a tile "a" away from a given
    tile in the board should be b rows away from that tile *)
