@@ -3,10 +3,58 @@ open Board
 open Words
 open ANSITerminal
 open Art
+open Score
+open Trie_func
+
+
+let validate_words (trie : t) (word_list : string list) 
+  (possible_words : string list): string list =
+  List.filter 
+    (fun (x : string) -> trie_contains_word trie (word_to_list x) 
+    && (List.mem x possible_words)) word_list
 
 (* prompts user for list of words, and then prints out words nicely and
    scores nicely, then says game over For Later: add play again feature *)
-let game_end (input_board : board) : unit = failwith "Unimplemented"
+let game_end (input_board : board) (possible_words : string list): unit = 
+  ANSITerminal.(
+    print_string [ green ]
+      "Please enter the list of words that you found in the board. \
+        Separate each word with a space. ");
+  ANSITerminal.(print_string [ green; Blink ] "\n>> ");
+  let validated_word_list = 
+    let word_list = 
+      read_line ()
+      |> String.uppercase_ascii
+      |> String.split_on_char ' ' 
+    in
+  validate_words word_trie word_list possible_words
+  in
+  let score = 
+    ANSITerminal.(
+    print_string [ green ]
+      "How would you like your words to be scored? Type (1) for Boggle scoring\
+       and (2) for WordHunt scoring. ");
+    ANSITerminal.(print_string [ green; Blink ] "\n>> ");
+    let input = read_line () |> int_of_string_opt in
+    match input with
+    | None ->
+        ANSITerminal.(
+          print_string [ red; Bold ] "Invalid input. Ending game...\n");
+        exit 0
+    | Some int ->
+        match int with
+        | 1 -> boggle_scoring_single validated_word_list
+        | 2 -> wordhunt_scoring_single validated_word_list
+        | _ ->  ( ANSITerminal.(
+            print_string [ red; Bold ] "Invalid input. Ending game...\n");
+          exit 0)
+    in
+  begin
+    ANSITerminal.(print_string [ magenta ; Bold ]
+      ("CONGRATULATIONS! Your score is: \n" ^ (string_of_int score) ^ "\n"));
+    ANSITerminal.(print_string [ magenta ; Bold ]
+      "GOODBYE TONY <3\n");
+  end
 
 let rec repeat (s : string) (n : int) : string =
   if n = 0 then "" else s ^ repeat s (n - 1)
@@ -55,7 +103,7 @@ let rec countdown
     ANSITerminal.(erase Screen);
     print_board input_board;
     ANSITerminal.(print_string [ magenta; Bold ] (time_up ^ "\n"));
-    game_end input_board
+    game_end input_board (find_possible_words input_board)
   end
   else begin
     print_board input_board;
@@ -77,6 +125,7 @@ let rec countdown
 (* intializes game >>greet user >>ask for name >>ask for size of board
    >>generates board *)
 let main () =
+  ANSITerminal.(resize 120 45);
   ANSITerminal.(print_string [ magenta; Bold ] welcome_ascii);
   ANSITerminal.(print_string [ cyan; Bold ] boggle_ascii2);
 
@@ -129,27 +178,6 @@ let main () =
   let curr_time = Unix.gettimeofday () in
   countdown new_board time_input curr_time
 
-(* ANSITerminal.(print_string [yellow] "Would you like to clear the
-   existing scores first? (y/n) "); let clear = read_line () |>
-   String.lowercase_ascii in clear |> clear_score "scores.txt";
-
-   print_endline "\n";
-
-   let board = generate_board_init 16 in let dictionary = word_list
-   "dictionary.txt" in let prefix_tree = dictionary |> create_trie in
-   let lst_of_all_words = all_words board prefix_tree |> intersect
-   dictionary in begin ANSITerminal.(print_string [yellow; Bold] "This
-   is your board: \n\n"); board |> to_board_str_list |> display;
-
-   print_endline "\n";
-
-   ANSITerminal.(print_string [yellow; Bold] "How many seconds would you
-   like? ");
-
-   let req_time = read_line () |> float_of_string_opt in match req_time
-   with | None -> ANSITerminal.(print_string [magenta; Bold] "\n\nGame
-   ended due to invalid time.\n\n"); | Some time -> Unix.gettimeofday ()
-   |> play lst_of_all_words [] dictionary board time *)
 
 (* launches game *)
 let () = main ()
