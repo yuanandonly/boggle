@@ -1,5 +1,6 @@
 open Trie
 open Board
+open Trie_func
 
 (** Converts [corpus.txt] into a readable string *)
 val read_whole_file : string -> string
@@ -13,11 +14,8 @@ val listed_strings : string -> string list
 (** Filters all empty space from the list *)
 val filtered_list : string list
 
-(* implements the Trie_func module *)
-module Trie_module = Trie_func
-
 (* creates a trie with all the words in our corpus *)
-val word_trie : Trie_module.t
+val word_trie : t
 
 (* Array of the adjacent tiles of each tile in a 4x4 board, position of
    tile corresponds to the index. *)

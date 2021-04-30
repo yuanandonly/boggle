@@ -1,1 +1,1 @@
-test.ml: OUnit2
+test.ml: Board List Main OUnit2 Score Trie Trie_func Words

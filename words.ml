@@ -1,6 +1,7 @@
 open Board
 open Trie
 open Str
+open Trie_func
 
 let read_whole_file (filename : string) =
   let ch = open_in filename in
@@ -18,9 +19,7 @@ let filtered_list =
     (fun x -> String.length x > 0)
     (listed_strings "corpus.txt")
 
-module Trie_module = Trie_func
-
-let word_trie = Trie_module.trie_instantiate filtered_list
+let word_trie = trie_instantiate filtered_list
 
 let adjacent_tiles =
   [|
@@ -59,14 +58,8 @@ let rec fold_custom
         (* check if new word is in trie and if word, add*)
         let tile = List.nth input_board.board_letters h in
         let new_word = curr_word ^ tile in
-        if
-          Trie_module.trie_contains word_trie
-            (Trie_module.word_to_list new_word)
-        then
-          if
-            Trie_module.trie_contains_word word_trie
-              (Trie_module.word_to_list new_word)
-          then
+        if trie_contains word_trie (word_to_list new_word) then
+          if trie_contains_word word_trie (word_to_list new_word) then
             find_helper new_word h input_board (new_word :: found)
               (h :: visited)
             @ fold_custom curr_word board_loc input_board visited found

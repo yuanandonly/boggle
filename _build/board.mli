@@ -8,9 +8,22 @@ type board = {
   board_letters : string list;
 }
 
-(** [init i] is a randomized Boggle game board with width and length int
-    [i]. *)
-val init : int -> board
+(** The abstract type of values representing boggle dice *)
+type die = { letters : string list }
+
+(** [manual_init i str] is a manually generated Boggle game board with
+    dimension [i] and letters [str]. Raises an exception if the
+    dimension does not match the number of letters in [str]. *)
+val manual_init : int -> string -> board
+
+(** [rand_init i] is a randomized Boggle game board with width and
+    length int [i]. Letters are completely randomized, with every letter
+    having an equal chance to appear on every square.*)
+val rand_init : int -> board
+
+(** [init_classic i] is a randomized classic boggle board of size 4 or 5
+    represented by [i] and implemented with dice *)
+val init_classic : int -> board
 
 (* for a pair (a, b) in the assoc list, a tile "a" away from a given
    tile in the board should be b rows away from that tile *)
