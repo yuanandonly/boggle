@@ -19,7 +19,7 @@ val word_trie : t
 
 (* Array of the adjacent tiles of each tile in a 4x4 board, position of
    tile corresponds to the index. *)
-val adjacent_tiles : int list array
+val adjacent_tiles_4 : int list array
 
 (* Recursive component of the Boggle DFS algorithm. Modified version of
    the List.fold_left function that folds through adjacent tiles to the
@@ -34,6 +34,7 @@ val fold_custom :
   board ->
   int list ->
   string list ->
+  int list array ->
   int list ->
   string list
 
@@ -41,7 +42,8 @@ val fold_custom :
    a boggle board, calls the fold_custom recursive functions and passes
    in the adjacent tiles. *)
 val find_helper :
-  string -> int -> board -> string list -> int list -> string list
+  string -> int -> board -> string list -> int list 
+      -> int list array -> string list
 
 (* a modified version List.fold_left that also passes along the index
    [ind] of the current head of in the original starting list [l]. Sort

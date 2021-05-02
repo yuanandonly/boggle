@@ -21,7 +21,7 @@ let filtered_list =
 
 let word_trie = trie_instantiate filtered_list
 
-let adjacent_tiles =
+let adjacent_tiles_4 =
   [|
     [ 1; 5; 4 ];
     [ 0; 2; 6; 5; 4 ];
@@ -47,13 +47,15 @@ let rec fold_custom
     (input_board : board)
     (visited : int list)
     (found : string list)
-    (adj_ind : int list) : string list =
+    (adj_arr : int list array)
+    (adj_ind : int list) 
+     : string list =
   match adj_ind with
   | [] -> found
   | h :: t ->
       if List.mem h visited then
         (* no new words, immediately go onto next adj ind*)
-        fold_custom curr_word board_loc input_board visited found t
+        fold_custom curr_word board_loc input_board visited found adj_arr t
       else
         (* check if new word is in trie and if word, add*)
         let tile = List.nth input_board.board_letters h in
@@ -61,24 +63,25 @@ let rec fold_custom
         if trie_contains word_trie (word_to_list new_word) then
           if trie_contains_word word_trie (word_to_list new_word) then
             find_helper new_word h input_board (new_word :: found)
-              (h :: visited)
+              (h :: visited) adj_arr
             @ fold_custom curr_word board_loc input_board visited found
-                t
+              adj_arr t
           else
-            find_helper new_word h input_board found (h :: visited)
+            find_helper new_word h input_board found (h :: visited) adj_arr
             @ fold_custom curr_word board_loc input_board visited found
-                t
-        else fold_custom curr_word board_loc input_board visited found t
+              adj_arr t
+        else fold_custom curr_word board_loc input_board visited found adj_arr t
 
 and find_helper
     (curr_word : string)
     (board_loc : int)
     (input_board : board)
     (found : string list)
-    (visited : int list) : string list =
-  let adjacent_indices = adjacent_tiles.(board_loc) in
+    (visited : int list) 
+    (adj_arr : int list array) : string list =
+  let adjacent_indices = Array.get adj_arr board_loc in
   fold_custom curr_word board_loc input_board visited found
-    adjacent_indices
+    adj_arr adjacent_indices 
 
 let rec fold_left_ind
     (f : string list -> string -> int -> string list)
@@ -90,11 +93,11 @@ let rec fold_left_ind
   | a :: l -> fold_left_ind f (f accu a ind) l (ind + 1)
 
 let find_possible_words (input_board : board) : string list =
-  (* let adjacencies = Board.adj_table input_board.dim in*)
+  let adjacencies = adj_table input_board.dim in
   let with_duplicates =
     fold_left_ind
       (fun accu a ind ->
-        accu @ find_helper a ind input_board [] [ ind ])
+        accu @ find_helper a ind input_board [] [ ind ] adjacencies)
       [] input_board.board_letters 0
   in
   List.sort_uniq compare with_duplicates
