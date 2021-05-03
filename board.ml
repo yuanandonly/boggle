@@ -5,7 +5,7 @@ type board = {
 
 type die = { letters : string list }
 
-let _ = Random.self_init
+let _ = Random.self_init ()
 (* should make it so you never get the same board but right now it looks
    like every first time I initialize this file and create a 4x4 classic
    board I get the same letters*)
@@ -54,9 +54,7 @@ let rec dice_randomizer (acc : int list) (count : int) (dim : int) =
       else find_num ((x + 1) mod (dim * dim))
     in
     dice_randomizer
-      ((dim * dim 
-      |> Random.int 
-      |> find_num) :: acc)
+      ((dim * dim |> Random.int |> find_num) :: acc)
       (count - 1) dim
 
 let init_classic (dim : int) =
@@ -66,8 +64,7 @@ let init_classic (dim : int) =
     | -1 -> acc
     | x ->
         let letter =
-          count 
-          |> List.nth dice_loc
+          count |> List.nth dice_loc
           |> List.nth (if dim = 4 then dice4 else dice5)
           |> roll
         in
@@ -88,11 +85,7 @@ let manual_init (size : int) (letters : string) : board =
 
 let rand_init (size : int) =
   let rand_chr () =
-    26 
-    |> Random.int 
-    |> ( + ) 65 
-    |> Char.chr 
-    |> Char.escaped
+    26 |> Random.int |> ( + ) 65 |> Char.chr |> Char.escaped
   in
   let rec loop i acc =
     if i = size * size then acc else loop (i + 1) (rand_chr () :: acc)
