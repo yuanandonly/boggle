@@ -13,9 +13,8 @@ let validate_words (trie : t) (word_list : string list)
     (fun (x : string) -> trie_contains_word trie (word_to_list x) 
     && (List.mem x possible_words)) word_list
 
-(* prompts user for list of words, and then prints out words nicely and
-   scores nicely, then says game over For Later: add play again feature *)
-let game_end (input_board : board) (possible_words : string list): unit = 
+let game_end_single (input_board : board) (possible_words : string list)
+    (player_name : string) : unit = 
   ANSITerminal.(
     print_string [ green ]
       "Please enter the list of words that you found in the board. \
@@ -70,7 +69,8 @@ let clear = repeat "\n" 45
 let rec countdown
     (input_board : board)
     (time_length : int)
-    (time_start : float) : unit =
+    (time_start : float)
+    (player_name_list : string list) : unit =
   ANSITerminal.(resize 120 45);
   (* (print_board input_board); *)
   let time_passed = Unix.gettimeofday () -. time_start in
@@ -103,7 +103,13 @@ let rec countdown
     ANSITerminal.(erase Screen);
     print_board input_board;
     ANSITerminal.(print_string [ magenta; Bold ] (time_up ^ "\n"));
-    game_end input_board (find_possible_words input_board)
+    if List.length player_name_list = 1
+      then
+        game_end_single input_board (find_possible_words input_board) 
+          (List.hd player_name_list)
+      else
+        (* make multiplayer game_end *)
+        ()
   end
   else begin
     print_board input_board;
@@ -119,16 +125,59 @@ let rec countdown
     Unix.sleepf 0.1;
     ANSITerminal.(print_string [ white ] clear);
     (* ANSITerminal.(erase Above); *)
-    countdown input_board time_length time_start
+    countdown input_board time_length time_start player_name_list
   end
 
-(* intializes game >>greet user >>ask for name >>ask for size of board
-   >>generates board *)
-let main () =
+let terminal_player_name : string list = 
+  let game_mode = 
+    ANSITerminal.(resize 120 45);
+    ANSITerminal.(print_string [ magenta; Bold ] welcome_ascii);
+    ANSITerminal.(print_string [ cyan; Bold ] boggle_ascii2);
+    ANSITerminal.( print_string [ green ]
+      "\nHow would you like to play? Type (1) for singleplayer or (2) for \ 
+      Multiplayer.\n");
+    ANSITerminal.(print_string [ green; Blink ] ">> ");
+    let input = read_line () |> int_of_string_opt in
+    match input with
+    | None ->
+        ANSITerminal.(
+          print_string [ red; Bold ] "Invalid input. Ending game...\n");
+        exit 0
+    | Some num ->
+        match num with
+        | 1 -> num
+        | 2 -> num
+        | _ ->  ( ANSITerminal.(
+            print_string [ red; Bold ] "Invalid input. Ending game...\n");
+          exit 0)
+  in
+  if game_mode = 1
+    then
+      (ANSITerminal.( print_string [ green ]
+      "What is your name? Use the same name if you've played previously.\n");
+      ANSITerminal.(print_string [ green; Blink ] ">> ");
+      let input = read_line () in
+      input :: [])
+  else
+      (ANSITerminal.( print_string [ green ]
+      "Please type all the names of the players into the same line, separated \
+      by spaces. Use the same names if you've played previously. \n");
+      ANSITerminal.(print_string [ green; Blink ] ">> ");
+      let input = read_line () |> String.split_on_char ' ' in
+      input)
+
+(* let ascii_intro = 
   ANSITerminal.(resize 120 45);
   ANSITerminal.(print_string [ magenta; Bold ] welcome_ascii);
   ANSITerminal.(print_string [ cyan; Bold ] boggle_ascii2);
+  () *)
 
+(* initializes game >>greet user >>ask for name >>ask for size of board
+   >>generates board *)
+let main () =
+  (* let _ = ascii_intro in *)
+  (* if singleplayer, it's a length 1 list with the player name *)
+  let player_name_list = terminal_player_name in
   ANSITerminal.(
     print_string [ green ]
       "How large would you like your board to be? Provide a \
@@ -152,9 +201,6 @@ let main () =
     match dim with 4 | 5 -> init_classic dim | _ -> rand_init dim
   in
   let new_board = get_board board_size in
-  ANSITerminal.(print_string [ green ] "Here is your board: \n");
-  print_board new_board;
-
   ANSITerminal.(
     print_string [ green ]
       "How long would you like for the round? Provide a number in \
@@ -176,7 +222,11 @@ let main () =
           exit 0)
   in
   let curr_time = Unix.gettimeofday () in
-  countdown new_board time_input curr_time
+  begin
+    ANSITerminal.(print_string [ green ] (String.concat " " player_name_list));
+    (* print_board new_board; *)
+    countdown new_board time_input curr_time player_name_list
+  end
 
 
 (* launches game *)
