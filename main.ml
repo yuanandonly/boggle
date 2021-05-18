@@ -8,7 +8,7 @@ open Trie_func
 
 
 let validate_words (trie : t) (word_list : string list) 
-  (possible_words : string list): string list =
+  (possible_words : string list) : string list =
   List.filter 
     (fun (x : string) -> trie_contains_word trie (word_to_list x) 
     && (List.mem x possible_words)) word_list
@@ -31,7 +31,7 @@ let game_end_single (input_board : board) (possible_words : string list)
   let score = 
     ANSITerminal.(
     print_string [ green ]
-      "How would you like your words to be scored? Type (1) for Boggle scoring\
+      "How would you like your words to be scored? Type (1) for Boggle scoring \
        and (2) for WordHunt scoring. ");
     ANSITerminal.(print_string [ green; Blink ] "\n>> ");
     let input = read_line () |> int_of_string_opt in
@@ -53,6 +53,60 @@ let game_end_single (input_board : board) (possible_words : string list)
       ("CONGRATULATIONS! Your score is: \n" ^ (string_of_int score) ^ "\n"));
     ANSITerminal.(print_string [ magenta ; Bold ]
       "GOODBYE TONY <3\n");
+  end
+
+let rec player_word_input (player_name_list : string list) 
+    (acc : (string list) list) : (string list) list =
+    match player_name_list with
+    | [] -> acc
+    | h :: t -> 
+      let input = 
+        ANSITerminal.(
+          printf [ green ]
+            "Please enter the list of words for: < %s >. \
+              Separate each word with a space. " h);
+        ANSITerminal.(print_string [ green; Blink ] "\n>> ");
+        read_line () |> String.split_on_char ' '
+      in
+      player_word_input t (acc @ [input])
+
+let multi_score_print (player_name_list : string list) (score_list : int list)
+    : unit = 
+    ANSITerminal.(print_string [ magenta ; Bold ]
+      "SCORES\n");
+    List.iter2 
+      (fun name score -> ANSITerminal.(printf [ green ]
+        "%s \t => %d\n" name score);()) player_name_list score_list;
+    ()
+    
+let game_end_multi (input_board : board) (possible_words : string list)
+  (player_name_list : string list) : unit = 
+  let player_word_list = player_word_input player_name_list [] in
+  let validated_word_list = 
+    List.map (fun x -> validate_words word_trie x possible_words) 
+      player_word_list
+  in
+  let score_list = 
+    ANSITerminal.(print_string [ green ]
+      "How would you like your words to be scored? Type (1) for Boggle scoring \
+      and (2) for WordHunt scoring. ");
+    ANSITerminal.(print_string [ green; Blink ] "\n>> ");
+    let input = read_line () |> int_of_string_opt in
+    match input with
+    | None ->
+        ANSITerminal.(
+          print_string [ red; Bold ] "Invalid input. Ending game...\n");
+        exit 0
+    | Some int ->
+        match int with
+        | 1 -> boggle_scoring_multi validated_word_list
+        | 2 -> wordhunt_scoring_multi validated_word_list
+        | _ ->  ( ANSITerminal.(
+            print_string [ red; Bold ] "Invalid input. Ending game...\n");
+          exit 0)
+  in
+  begin
+    multi_score_print player_name_list score_list
   end
 
 let rec repeat (s : string) (n : int) : string =
@@ -108,8 +162,8 @@ let rec countdown
         game_end_single input_board (find_possible_words input_board) 
           (List.hd player_name_list)
       else
-        (* make multiplayer game_end *)
-        ()
+        game_end_multi input_board (find_possible_words input_board) 
+          player_name_list
   end
   else begin
     print_board input_board;
