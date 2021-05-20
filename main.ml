@@ -16,7 +16,7 @@ let validate_words
       && List.mem x possible_words)
     word_list
 
-let rec scoring_single input list =
+let rec scoring_single (input : int option) (list : string list) : int =
   let try_again = "Invalid Input. Try Again\n" in
   match input with
   | None ->
@@ -203,7 +203,7 @@ let terminal_player_name : string list =
     ANSITerminal.(
       print_string [ green ]
         "\n\
-         How would you like to play? Type (1) for singleplayer or (2) \
+         How would you like to play? Type (1) for Singleplayer or (2) \
          for  \n\
         \      Multiplayer.\n");
     ANSITerminal.(print_string [ green; Blink ] ">> ");

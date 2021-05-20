@@ -1,4 +1,4 @@
-MODULES=board score trie words authors main art gui test
+MODULES=board score trie words authors main art gui test score_view
 OBJECTS=$(MODULES:=.cmo)
 MLS=$(MODULES:=.ml)
 MLIS=$(MODULES:=.mli)
