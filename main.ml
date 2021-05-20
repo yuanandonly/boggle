@@ -16,21 +16,21 @@ let validate_words
       && List.mem x possible_words)
     word_list
 
-let rec scoring_single (input : int option) (list : string list) : int =
+let rec scoring_single (input : int option) (lst : string list) : int =
   let try_again = "Invalid Input. Try Again\n" in
   match input with
   | None ->
       ANSITerminal.(print_string [ red; Bold ] try_again);
       let new_input = read_line () |> int_of_string_opt in
-      scoring_single new_input list
+      scoring_single new_input lst
   | Some int -> (
       match int with
-      | 1 -> boggle_scoring_single list
-      | 2 -> wordhunt_scoring_single list
+      | 1 -> boggle_scoring_single lst
+      | 2 -> wordhunt_scoring_single lst
       | _ ->
           ANSITerminal.(print_string [ red; Bold ] try_again);
           let new_input = read_line () |> int_of_string_opt in
-          scoring_single new_input list)
+          scoring_single new_input lst)
 
 let game_end_single
     (input_board : board)
@@ -86,21 +86,22 @@ let multi_score_print
     player_name_list score_list;
   ()
 
-let rec scoring_multi input list =
+let rec scoring_multi (input : int option) (lst : string list list) :
+    int list =
   let try_again = "Invalid Input. Try Again\n" in
   match input with
   | None ->
       ANSITerminal.(print_string [ red; Bold ] try_again);
       let new_input = read_line () |> int_of_string_opt in
-      scoring_multi new_input list
+      scoring_multi new_input lst
   | Some int -> (
       match int with
-      | 1 -> boggle_scoring_multi list
-      | 2 -> wordhunt_scoring_multi list
+      | 1 -> boggle_scoring_multi lst
+      | 2 -> wordhunt_scoring_multi lst
       | _ ->
           ANSITerminal.(print_string [ red; Bold ] try_again);
           let new_input = read_line () |> int_of_string_opt in
-          scoring_multi new_input list)
+          scoring_multi new_input lst)
 
 let game_end_multi
     (input_board : board)
@@ -195,34 +196,35 @@ let rec countdown
     countdown input_board time_length time_start player_name_list
   end
 
+let rec choose_game_mode (input : int option) : int =
+  let try_again = "Invalid Input. Try Again\n" in
+  match input with
+  | None ->
+      ANSITerminal.(print_string [ red; Bold ] try_again);
+      let new_input = read_line () |> int_of_string_opt in
+      choose_game_mode new_input
+  | Some int -> (
+      match int with
+      | 1 -> 1
+      | 2 -> 2
+      | _ ->
+          ANSITerminal.(print_string [ red; Bold ] try_again);
+          let new_input = read_line () |> int_of_string_opt in
+          choose_game_mode new_input)
+
 let terminal_player_name : string list =
-  let game_mode =
-    ANSITerminal.(resize 120 45);
-    ANSITerminal.(print_string [ magenta; Bold ] welcome_ascii);
-    ANSITerminal.(print_string [ cyan; Bold ] boggle_ascii2);
-    ANSITerminal.(
-      print_string [ green ]
-        "\n\
-         How would you like to play? Type (1) for Singleplayer or (2) \
-         for  \n\
-        \      Multiplayer.\n");
-    ANSITerminal.(print_string [ green; Blink ] ">> ");
-    let input = read_line () |> int_of_string_opt in
-    match input with
-    | None ->
-        ANSITerminal.(
-          print_string [ red; Bold ] "Invalid input. Ending game...\n");
-        exit 0
-    | Some num -> (
-        match num with
-        | 1 -> num
-        | 2 -> num
-        | _ ->
-            ANSITerminal.(
-              print_string [ red; Bold ]
-                "Invalid input. Ending game...\n");
-            exit 0)
-  in
+  ANSITerminal.(resize 120 45);
+  ANSITerminal.(print_string [ magenta; Bold ] welcome_ascii);
+  ANSITerminal.(print_string [ cyan; Bold ] boggle_ascii2);
+  ANSITerminal.(
+    print_string [ green ]
+      "\n\
+       How would you like to play? Type (1) for Singleplayer or (2) \
+       for  \n\
+      \      Multiplayer.\n");
+  ANSITerminal.(print_string [ green; Blink ] ">> ");
+  let input = read_line () |> int_of_string_opt in
+  let game_mode = choose_game_mode input in
   if game_mode = 1 then (
     ANSITerminal.(
       print_string [ green ]
@@ -241,6 +243,34 @@ let terminal_player_name : string list =
     let input = read_line () |> String.split_on_char ' ' in
     input)
 
+let rec choose_board_size (input : int option) : int =
+  let try_again = "Invalid Input. Try Again\n" in
+  match input with
+  | None ->
+      ANSITerminal.(print_string [ red; Bold ] try_again);
+      let new_input = read_line () |> int_of_string_opt in
+      choose_board_size new_input
+  | Some int ->
+      if int >= 4 && int <= 10 then int
+      else (
+        ANSITerminal.(print_string [ red; Bold ] try_again);
+        let new_input = read_line () |> int_of_string_opt in
+        choose_board_size new_input)
+
+let rec choose_time (input : int option) : int =
+  let try_again = "Invalid Input. Try Again\n" in
+  match input with
+  | None ->
+      ANSITerminal.(print_string [ red; Bold ] try_again);
+      let new_input = read_line () |> int_of_string_opt in
+      choose_time new_input
+  | Some int ->
+      if int >= 0 && int <= 10000 then int
+      else (
+        ANSITerminal.(print_string [ red; Bold ] try_again);
+        let new_input = read_line () |> int_of_string_opt in
+        choose_time new_input)
+
 (* let ascii_intro = ANSITerminal.(resize 120 45);
    ANSITerminal.(print_string [ magenta; Bold ] welcome_ascii);
    ANSITerminal.(print_string [ cyan; Bold ] boggle_ascii2); () *)
@@ -256,20 +286,8 @@ let main () =
       "How large would you like your board to be? Provide a \
        side-length between 4 and 10.");
   ANSITerminal.(print_string [ green; Blink ] "\n>> ");
-  let board_size =
-    let input = read_line () |> int_of_string_opt in
-    match input with
-    | None ->
-        ANSITerminal.(
-          print_string [ red; Bold ] "Invalid input. Ending game...\n");
-        exit 0
-    | Some int ->
-        if int >= 4 && int <= 10 then int
-        else (
-          ANSITerminal.(
-            print_string [ red; Bold ] "Invalid input. Ending game...\n");
-          exit 0)
-  in
+  let input = read_line () |> int_of_string_opt in
+  let board_size = choose_board_size input in
   let get_board dim =
     match dim with 4 | 5 -> init_classic dim | _ -> rand_init dim
   in
@@ -280,20 +298,8 @@ let main () =
        seconds. \n\
        (Normal boggle round is 3 minutes = 180 seconds)");
   ANSITerminal.(print_string [ green; Blink ] "\n>> ");
-  let time_input =
-    let input = read_line () |> int_of_string_opt in
-    match input with
-    | None ->
-        ANSITerminal.(
-          print_string [ red; Bold ] "Invalid input. Ending game...\n");
-        exit 0
-    | Some int ->
-        if int >= 0 && int <= 10000 then int
-        else (
-          ANSITerminal.(
-            print_string [ red; Bold ] "Invalid input. Ending game...\n");
-          exit 0)
-  in
+  let input = read_line () |> int_of_string_opt in
+  let time_input = choose_time input in
   let curr_time = Unix.gettimeofday () in
   ANSITerminal.(
     print_string [ green ] (String.concat " " player_name_list));
