@@ -32,6 +32,9 @@ let convert_helper (s : string) : entry =
 let convert (string_entries : string list) : entry list =
   List.map convert_helper string_entries
 
+let get_entries (gamemode : string) : entry list =
+  gamemode |> read |> convert
+
 let write gamemode name score board time : unit =
   let oc =
     match gamemode with
