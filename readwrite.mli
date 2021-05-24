@@ -1,3 +1,5 @@
+(** Facilitates reading and writing highscores. *)
+
 (** [entry] is the type of an entry corresponding to a player's game,
     including player name, the score, the size of the board, and the
     length of time. *)

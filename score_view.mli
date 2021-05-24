@@ -1,3 +1,5 @@
+(** Contains functions for printing scores. *)
+
 (** [print_highscores gm] prints the the top 10 highscores played on
     classic boards (4 x 4) for gamemode [gm] into the terminal.
 

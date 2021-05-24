@@ -1,3 +1,5 @@
+(** Scoring Boggle/Word Hunt games. *)
+
 (* Word Hunt scoring based on length of word: <3: 0 3: 100 4: 400 5: 800
    6+: 400*length - 1000 (i.e. 6 is 1400 and add 400 after for each
    letter)

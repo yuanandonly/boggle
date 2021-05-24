@@ -1,3 +1,5 @@
+(** Contains word art used in the game. *)
+
 (* welcome ascii string *)
 val welcome_ascii : string
 

@@ -1,3 +1,5 @@
+(** Implements an AI player to compete against. *)
+
 (* given chosen difficulty, the computer will randomly choose a subset
    of the possible letters on the board EASY (0) : 5% of words length
    3-4 NOVICE (1) : 10% of words length 3-5 MEDIUM (2) : 15% of words

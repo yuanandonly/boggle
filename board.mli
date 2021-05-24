@@ -2,13 +2,13 @@
 
     This module represents the static board that Boggle is played on. *)
 
-(** The abstract type of values representing the game state. *)
+(** [board] is a board representing the game state. *)
 type board = {
   dim : int;
   board_letters : string list;
 }
 
-(** The abstract type of values representing boggle dice *)
+(** [die] is a boggle die *)
 type die = { letters : string list }
 
 (** [manual_init i str] is a manually generated Boggle game board with

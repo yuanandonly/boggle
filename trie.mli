@@ -1,3 +1,5 @@
+(** Enables word identification using a trie. *)
+
 type t = Node of bool * (string * t) list
 
 val empty : unit -> t
