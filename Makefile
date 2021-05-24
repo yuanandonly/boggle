@@ -1,4 +1,4 @@
-MODULES=board score trie words authors main art gui test score_view ai_player
+MODULES=board score trie words authors main art gui test score_view ai_player readwrite
 OBJECTS=$(MODULES:=.cmo)
 MLS=$(MODULES:=.ml)
 MLIS=$(MODULES:=.mli)
