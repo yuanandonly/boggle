@@ -10,7 +10,6 @@
 (* 1. single player word hunt testing, returns int score scoring scheme,
    based on word length: <3: 0 3: 100 4: 400 5: 800 6+: 400*length -
    1000 (i.e. 6 is 1400 and add 400 after for each letter)*)
-
 val wordhunt_scoring_helper : int -> string -> int
 
 val wordhunt_scoring_single : string list -> int
@@ -30,6 +29,7 @@ val wordhunt_scoring_multi : string list list -> int list
    player submitted it), then give them credit. *)
 val boggle_scoring_helper : int -> string -> int
 
+(* initializes map with strings as keys *)
 module StringMap : Map.S with type key = String.t
 
 (** boggle_scoring_single lst is the boggle score for a list `lst` of

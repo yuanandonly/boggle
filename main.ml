@@ -235,7 +235,7 @@ and game_end_single
              word with a space. "
             h);
         ANSITerminal.(print_string [ green; Blink ] "\n>> ");
-        read_line () |> String.split_on_char ' '
+        read_line () |> String.uppercase_ascii |> String.split_on_char ' '
       in
       player_word_input t (acc @ [ input ])
 
