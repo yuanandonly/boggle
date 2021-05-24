@@ -1,6 +1,6 @@
 (** Contains word art used in the game. *)
 
-(* welcome ascii string *)
+(** welcome ascii string *)
 val welcome_ascii : string
 
 (** boggle ascii art string *)

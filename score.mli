@@ -5,7 +5,6 @@
    letter)
 
    Boggle scoring: https://www.fgbradleys.com/rules/Boggle.pdf*)
-val wordhunt_scoring_helper : int -> string -> int
 
 (** [wordhunt_scoring_single wlst] is the wordhunt score for a word-list
     [wlst]. *)
@@ -15,19 +14,17 @@ val wordhunt_scoring_single : string list -> int
     corresponding to a list of a word-lists [wllst]. *)
 val wordhunt_scoring_multi : string list list -> int list
 
-val boggle_scoring_helper : int -> string -> int
-
-(* initializes map with strings as keys *)
+(** initializes map with strings as keys *)
 module StringMap : Map.S with type key = String.t
 
 (** boggle_scoring_single lst is the boggle score for a list `lst` of
     player words playing on their own *)
 val boggle_scoring_single : string list -> int
 
-(* freqmap_word_helper adds a word to the frequency map (acc) *)
+(** freqmap_word_helper adds a word to the frequency map (acc) *)
 val freqmap_word_helper : int StringMap.t -> string -> int StringMap.t
 
-(* freqmap_list_helper adds a list of words to the frequency map (acc) *)
+(** freqmap_list_helper adds a list of words to the frequency map (acc) *)
 val freqmap_list_helper :
   int StringMap.t -> string list -> int StringMap.t
 
