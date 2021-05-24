@@ -6,6 +6,10 @@
 
    Boggle scoring: https://www.fgbradleys.com/rules/Boggle.pdf*)
 
+(** [wordhunt_scoring_helper acc s] is the word hunt score of string [s]
+    added to [acc]. *)
+val wordhunt_scoring_helper : int -> string -> int
+
 (** [wordhunt_scoring_single wlst] is the wordhunt score for a word-list
     [wlst]. *)
 val wordhunt_scoring_single : string list -> int
@@ -13,6 +17,10 @@ val wordhunt_scoring_single : string list -> int
 (** [wordhunt_scoring_multi wllst] is a list of wordhunt scores
     corresponding to a list of a word-lists [wllst]. *)
 val wordhunt_scoring_multi : string list list -> int list
+
+(** [boggle_scoring_helper acc s] is the boggle score of string [s]
+    added to [acc]. *)
+val boggle_scoring_helper : int -> string -> int
 
 (** initializes map with strings as keys *)
 module StringMap : Map.S with type key = String.t
