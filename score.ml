@@ -61,6 +61,3 @@ let boggle_scoring_multi (word_sets : string list list) : int list =
   in
   (* finally, using comparer to map player word lists to integer scores*)
   List.map comparer word_sets
-
-let score_rarity (words : string list) : int =
-  failwith "Unimplemented, semioptional"
