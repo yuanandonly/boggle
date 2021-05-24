@@ -17,8 +17,8 @@ type die = { letters : string list }
 val manual_init : int -> string -> board
 
 (** [rand_init i] is a randomized Boggle game board with width and
-    length int [i]. Letters are completely randomized, with every letter
-    having an equal chance to appear on every square.*)
+    length int [i]. Letters are derived by rolling a random die from the
+    5x5 boggle board.*)
 val rand_init : int -> board
 
 (** [init_classic i] is a randomized classic boggle board of size 4 or 5
