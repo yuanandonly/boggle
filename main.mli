@@ -1,6 +1,5 @@
 open Board
 open Trie
-open Trie_func
 
 (** iterates through list [l] and prints each string *)
 val printlist : string list -> unit
@@ -12,7 +11,7 @@ val printllist : string list list -> unit
 (** given a [word_list] string list, filters through and removes all
     words that are not in [possible_words] and therefore cannot be found
     from given board *)
-val validate_words : t -> string list -> string list -> string list
+val validate_words : string list -> string list -> string list
 
 (** repeats a string [s] [n] number of times *)
 val repeat : string -> int -> string

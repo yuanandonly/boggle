@@ -1,7 +1,6 @@
 open Board
 open Trie
 open Str
-open Trie_func
 
 let read_whole_file (filename : string) =
   let ch = open_in filename in
@@ -48,14 +47,14 @@ let rec fold_custom
     (visited : int list)
     (found : string list)
     (adj_arr : int list array)
-    (adj_ind : int list) 
-     : string list =
+    (adj_ind : int list) : string list =
   match adj_ind with
   | [] -> found
   | h :: t ->
       if List.mem h visited then
         (* no new words, immediately go onto next adj ind*)
-        fold_custom curr_word board_loc input_board visited found adj_arr t
+        fold_custom curr_word board_loc input_board visited found
+          adj_arr t
       else
         (* check if new word is in trie and if word, add*)
         let tile = List.nth input_board.board_letters h in
@@ -65,23 +64,26 @@ let rec fold_custom
             find_helper new_word h input_board (new_word :: found)
               (h :: visited) adj_arr
             @ fold_custom curr_word board_loc input_board visited found
-              adj_arr t
+                adj_arr t
           else
-            find_helper new_word h input_board found (h :: visited) adj_arr
+            find_helper new_word h input_board found (h :: visited)
+              adj_arr
             @ fold_custom curr_word board_loc input_board visited found
-              adj_arr t
-        else fold_custom curr_word board_loc input_board visited found adj_arr t
+                adj_arr t
+        else
+          fold_custom curr_word board_loc input_board visited found
+            adj_arr t
 
 and find_helper
     (curr_word : string)
     (board_loc : int)
     (input_board : board)
     (found : string list)
-    (visited : int list) 
+    (visited : int list)
     (adj_arr : int list array) : string list =
-  let adjacent_indices = Array.get adj_arr board_loc in
-  fold_custom curr_word board_loc input_board visited found
-    adj_arr adjacent_indices 
+  let adjacent_indices = adj_arr.(board_loc) in
+  fold_custom curr_word board_loc input_board visited found adj_arr
+    adjacent_indices
 
 let rec fold_left_ind
     (f : string list -> string -> int -> string list)
