@@ -15,7 +15,7 @@ let rec read_helper ic lst =
 let read (gamemode : string) : string list =
   match gamemode with
   | "boggle" -> read_helper (open_in "score_entries_boggle.txt") []
-  | "wordhunt" -> read_helper (open_in "score_entries_boggle.txt") []
+  | "wordhunt" -> read_helper (open_in "score_entries_wordhunt.txt") []
   | _ -> failwith "Not a gamemode"
 
 let convert_helper (s : string) : entry =
