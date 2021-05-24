@@ -37,20 +37,20 @@ let print_highscores (gamemode : string) : unit =
       (fun entry -> if entry.board = 4 then true else false)
       gamemode
   in
-  Printf.printf "------------ TOP 10 ------------";
-  Printf.printf "      SCORE    NAME       TIME  ";
+  Printf.printf "------------ TOP 10 ------------\n";
+  Printf.printf "      SCORE    NAME       TIME  \n";
   for i = 1 to 10 do
     let e_opt =
       try Some (List.nth entries (i - 1)) with exn -> None
     in
-    Printf.printf "%s" (highscore_helper i e_opt)
+    Printf.printf "%s\n" (highscore_helper i e_opt)
   done
 
 let player_helper i e : string =
   let score = e.score |> string_of_int |> center 7 in
   let board = e.board |> string_of_int |> center 3 in
   let time = (e.time |> string_of_int) ^ " secs" |> center 9 in
-  " " ^ score ^ " " ^ board ^ " " ^ time
+  "    " ^ score ^ " " ^ board ^ " " ^ time
 
 let print_player (gamemode : string) (player : string) =
   let player_entries =
@@ -58,13 +58,16 @@ let print_player (gamemode : string) (player : string) =
       (fun entry -> if entry.name = player then true else false)
       gamemode
   in
-  Printf.printf "%s" (center 28 (player ^ "'s " ^ gamemode ^ " scores"));
+  Printf.printf "%s\n"
+    (center 28 (player ^ "'s " ^ gamemode ^ " scores"));
   match List.length player_entries with
   | 0 ->
-      Printf.printf "%s" (center 28 "No scores found...");
-      Printf.printf "%s" (center 28 "Go play some " ^ gamemode ^ "!")
+      Printf.printf "%s\n" (center 28 "No scores found...");
+      Printf.printf "%s\n"
+        (center 28 ("Go play some " ^ gamemode ^ "!"))
   | x ->
+      Printf.printf "%s\n" "     SCORE BOARD   TIME";
       for i = 1 to x do
-        Printf.printf "%s"
+        Printf.printf "%s\n"
           (player_helper i (List.nth player_entries (i - 1)))
       done
