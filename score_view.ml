@@ -34,7 +34,7 @@ let get_entries_subset f gamemode =
 let print_highscores (gamemode : string) : unit =
   let entries =
     get_entries_subset
-      (fun entry -> if entry.board = 4 then true else false)
+      (fun entry -> if entry.boardsize = 4 then true else false)
       gamemode
   in
   Printf.printf "------------ TOP 10 ------------\n";
@@ -48,9 +48,9 @@ let print_highscores (gamemode : string) : unit =
 
 let player_helper i e : string =
   let score = e.score |> string_of_int |> center 7 in
-  let board = e.board |> string_of_int |> center 3 in
+  let boardsize = e.boardsize |> string_of_int |> center 3 in
   let time = (e.time |> string_of_int) ^ " secs" |> center 9 in
-  "    " ^ score ^ " " ^ board ^ " " ^ time
+  "    " ^ score ^ " " ^ boardsize ^ " " ^ time
 
 let print_player (gamemode : string) (player : string) =
   let player_entries =
