@@ -83,11 +83,10 @@ let manual_init (size : int) (letters : string) : board =
     { dim = size; board_letters = split letters [] }
 
 let rand_init (size : int) =
-  let rand_chr () =
-    26 |> Random.int |> ( + ) 65 |> Char.chr |> Char.escaped
-  in
+  let rand_letter () = 25 |> Random.int |> List.nth dice5 |> roll in
   let rec loop i acc =
-    if i = size * size then acc else loop (i + 1) (rand_chr () :: acc)
+    if i = size * size then acc
+    else loop (i + 1) (rand_letter () :: acc)
   in
   { dim = size; board_letters = loop 0 [] }
 
