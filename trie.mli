@@ -1,21 +1,21 @@
-module Trie_func : sig
-  type t
+type t = Node of bool * (string * t) list
 
-  val empty : unit -> t
+val empty : unit -> t
 
-  val extract_st_option : (string * t) option -> string * t
+val extract_st_option : (string * t) option -> string * t
 
-  val extract_t_option : t option -> t
+val extract_t_option : t option -> t
 
-  val word_to_list : string -> string list
+val word_to_list : string -> string list
 
-  val return_child_opt : (string * t) list -> string -> t option
+val children : t -> (string * t) list
 
-  val trie_insert : t -> string list -> t
+val return_child_opt : (string * t) list -> string -> t option
 
-  val trie_contains_word : t -> string list -> bool
+val trie_insert : t -> string list -> t
 
-  val trie_contains : t -> string list -> bool
+val trie_contains_word : t -> string list -> bool
 
-  val trie_instantiate : string list -> t
-end
+val trie_contains : t -> string list -> bool
+
+val trie_instantiate : string list -> t

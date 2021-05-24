@@ -6,6 +6,7 @@ type board = {
 type die = { letters : string list }
 
 let _ = Random.self_init ()
+
 (* should make it so you never get the same board but right now it looks
    like every first time I initialize this file and create a 4x4 classic
    board I get the same letters*)

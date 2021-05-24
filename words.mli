@@ -1,6 +1,5 @@
 open Trie
 open Board
-open Trie_func
 
 (** Converts [corpus.txt] into a readable string *)
 val read_whole_file : string -> string
@@ -42,8 +41,13 @@ val fold_custom :
    a boggle board, calls the fold_custom recursive functions and passes
    in the adjacent tiles. *)
 val find_helper :
-  string -> int -> board -> string list -> int list 
-      -> int list array -> string list
+  string ->
+  int ->
+  board ->
+  string list ->
+  int list ->
+  int list array ->
+  string list
 
 (* a modified version List.fold_left that also passes along the index
    [ind] of the current head of in the original starting list [l]. Sort
