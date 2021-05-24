@@ -1,5 +1,7 @@
 (** Enables word identification using a trie. *)
 
+(** [t] is a Trie node that contains a boolean value and a list of
+    tuples of children nodes and their corresponding character. *)
 type t = Node of bool * (string * t) list
 
 val empty : unit -> t
