@@ -1,7 +1,7 @@
 type entry = {
   name : string;
   score : int;
-  board : int;
+  boardsize : int;
   time : int;
 }
 
@@ -24,7 +24,7 @@ let convert_helper (s : string) : entry =
       {
         name = n;
         score = int_of_string s;
-        board = int_of_string b;
+        boardsize = int_of_string b;
         time = int_of_string t;
       }
   | _ -> failwith "Line in file does not correspond to entry"
@@ -35,7 +35,7 @@ let convert (string_entries : string list) : entry list =
 let get_entries (gamemode : string) : entry list =
   gamemode |> read |> convert
 
-let write gamemode name score board time : unit =
+let write gamemode name score boardsize time : unit =
   let oc =
     match gamemode with
     | "boggle" ->
@@ -44,5 +44,5 @@ let write gamemode name score board time : unit =
         open_out_gen [ Open_append ] 0o666 "score_entries_wordhunt.txt"
     | _ -> failwith "Not a gamemode"
   in
-  Printf.fprintf oc "%s %d %d %d" name score board time;
+  Printf.fprintf oc "%s %d %d %d\n" name score boardsize time;
   close_out oc

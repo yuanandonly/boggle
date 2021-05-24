@@ -1,5 +1,12 @@
-(** [entry] is the type of an entry corresponding to a player's game *)
-type entry
+(** [entry] is the type of an entry corresponding to a player's game,
+    including player name, the score, the size of the board, and the
+    length of time. *)
+type entry = {
+  name : string;
+  score : int;
+  boardsize : int;
+  time : int;
+}
 
 (** [read gm] is a list of all the entries for gamemode [gm] in string
     form
@@ -13,3 +20,8 @@ val read : string -> string list
     - Raises "Line in file does not correspond to entry" if an element
       in [str_entries] is not an entry*)
 val convert : string list -> entry list
+
+(** [write gm n s bs t] writes an entry with name [n], score [s],
+    boardsize [bs], and length of time [t] into a file corresponding to
+    gamemode [gm]*)
+val write : string -> string -> int -> int -> int -> unit
