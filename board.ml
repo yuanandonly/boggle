@@ -31,8 +31,7 @@ let die_init (die_num : int) (dim : int) : die =
     | -1 -> acc
     | x ->
         die_init_helper
-          (q_convert (Char.escaped die_letters.[count + (6 * die_num)])
-           :: acc)
+          (Char.escaped die_letters.[count + (6 * die_num)] :: acc)
           (count - 1)
   in
   { letters = die_init_helper [] 5 }
