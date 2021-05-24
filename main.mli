@@ -112,7 +112,6 @@ val choose_board_size : int option -> int
     neg. *)
 val choose_time : int option -> int
 
-<<<<<<< HEAD
 (** queries player for to either play or view, ensuring valid input.contents
  [input] int option and returns valid size *)
 val choose_play_view : int option -> int
@@ -131,13 +130,6 @@ val ask_view : unit -> unit
 (* queries player(s) for name / gamemode, board size, round length and 
 initiates countdown *)
 val play_game : unit -> unit 
-=======
-val ask_view : unit -> unit
-
-(* queries player(s) for name / gamemode, board size, round length and
-   initiates countdown *)
-val play_game : unit -> unit
->>>>>>> 3d7785417dc96ca2c76cd2cdcef17caa59d69be3
 
 (** main function that welcomes player, asks player to either view
     scores or play game*)

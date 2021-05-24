@@ -80,6 +80,7 @@ let rec choose_difficulty (input : int option) : int =
       choose_game_mode new_input
   | Some int -> (
       match int with
+      | 0 -> 0
       | 1 -> 1
       | 2 -> 2
       | 3 -> 3
@@ -500,8 +501,9 @@ and main () =
   ANSITerminal.(print_string [ green; Blink ] ">> ");
   let input = read_line () |> int_of_string_opt in
   let play_view = choose_play_view input in
-  (if play_view = 1 then play_game () else ANSITerminal.(erase Screen));
-  ask_view ()
+  if play_view = 1 then play_game () 
+  else (ANSITerminal.(erase Screen);
+    ask_view ())
 
 and ask_view () =
   ANSITerminal.(
