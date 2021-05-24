@@ -6,7 +6,8 @@ open Art
 open Score
 open Trie_func
 open Ai_player
-
+open Score_view
+open Readwrite
 
 let printlist l = List.iter (Printf.printf "%s ") l
 let printllist l = List.iter (fun ll -> printlist ll) l
@@ -88,60 +89,7 @@ let rec choose_difficulty (input : int option) : int =
           let new_input = read_line () |> int_of_string_opt in
           choose_game_mode new_input)
 
-let terminal_player_name : string list =
-  ANSITerminal.(resize 120 45);
-  ANSITerminal.(print_string [ magenta; Bold ] welcome_ascii);
-  ANSITerminal.(print_string [ cyan; Bold ] boggle_ascii2);
-  ANSITerminal.(
-    print_string [ green ]
-      "\n\
-       How would you like to play? Type (1) for Singleplayer, (2) \
-       for Multiplayer, or \n(3) to play against the computer.\n");
-  ANSITerminal.(print_string [ green; Blink ] ">> ");
-  let input = read_line () |> int_of_string_opt in
-  let game_mode = choose_game_mode input in
-  match game_mode with
-  | 1 -> (
-    ANSITerminal.(
-      print_string [ green ]
-        "What is your name? Use the same name if you've played \
-         previously.\n");
-    ANSITerminal.(print_string [ green; Blink ] ">> ");
-    let input = read_line () |> name_process in
-    [ input ])
-  | 2 -> (
-    ANSITerminal.(
-      print_string [ green ]
-        "Please type all the names of the players into the same line, \
-         separated by spaces. Use the same names if you've played \
-         previously. \n");
-    ANSITerminal.(print_string [ green; Blink ] ">> ");
-    let input = read_line () 
-      |> String.split_on_char ' ' |> name_process_list in
-    input)
-  | 3 | _ -> 
-    (ANSITerminal.(
-    print_string [ green ]
-      "What is your name? Use the same name if you've played \
-       previously.\n");
-    ANSITerminal.(print_string [ green; Blink ] ">> ");
-    let name_input = read_line () |> name_process in
-    ANSITerminal.(
-    print_string [ green ]
-      "What difficulty would you like the computer to be? \n\
-      (0) for EASY\n\
-      (1) for NOVICE\n\
-      (2) for MEDIUM\n\
-      (3) for HARD\n\
-      (4) for INSANE\n\
-      (5) for IMPOSSIBLE\n");
-    ANSITerminal.(print_string [ green; Blink ] ">> ");
-    let input = read_line () |> int_of_string_opt in
-    let diff_input = choose_difficulty input in
-    [name_input; Int.to_string diff_input])
-
-
-let rec scoring_single (input : int option) (lst : string list) : int =
+let rec scoring_single (input : int option) (lst : string list) : (int * int) =
   let try_again = "Invalid Input. Try Again\n" in
   match input with
   | None ->
@@ -151,8 +99,8 @@ let rec scoring_single (input : int option) (lst : string list) : int =
       scoring_single new_input lst
   | Some int -> (
       match int with
-      | 1 -> boggle_scoring_single lst
-      | 2 -> wordhunt_scoring_single lst
+      | 1 -> (boggle_scoring_single lst, 1)
+      | 2 -> (wordhunt_scoring_single lst, 2)
       | _ ->
           ANSITerminal.(print_string [ red; Bold ] try_again);
           ANSITerminal.(print_string [ red; Blink ] ">> ");
@@ -162,7 +110,7 @@ let rec scoring_single (input : int option) (lst : string list) : int =
 let rec play_again (player_name_list : string list) : unit = 
   ANSITerminal.(
     print_string [ green ]
-      ("Would you like to play again with the same player(s)? Y/N\n"));
+      ("Would you like to restart? Y/N\n"));
   ANSITerminal.(print_string [ green; Blink ] ">> ");
   let input = read_line () in
   match input with 
@@ -195,7 +143,7 @@ and view_all_words (possible_words : string list) : unit =
 and game_end_single
     (input_board : board)
     (possible_words : string list)
-    (player_name : string) : unit =
+    (player_name : string) (time_length : int): unit =
   ANSITerminal.(
     print_string [ green ]
       "Please enter the list of words that you found in the board. \
@@ -213,11 +161,13 @@ and game_end_single
        scoring and (2) for WordHunt scoring. ");
   ANSITerminal.(print_string [ green; Blink ] "\n>> ");
   let input = read_line () |> int_of_string_opt in
-  let score = scoring_single input validated_word_list in
+  let (score, gamemode) = scoring_single input validated_word_list in
   begin
     ANSITerminal.(
       print_string [ magenta; Bold ]
         ("CONGRATULATIONS! Your score is: \n" ^ string_of_int score ^ "\n"));
+    let game_name = if gamemode = 1 then "boggle" else "wordhunt" in
+    write game_name player_name score input_board.dim time_length;
     view_all_words possible_words;
     play_again [player_name]
   end
@@ -251,7 +201,7 @@ and multi_score_print
   ()
 
 and scoring_multi (input : int option) (lst : string list list) :
-    int list =
+    int list * int =
   let try_again = "Invalid Input. Try Again\n" in
   match input with
   | None ->
@@ -261,8 +211,8 @@ and scoring_multi (input : int option) (lst : string list list) :
       scoring_multi new_input lst
   | Some int -> (
       match int with
-      | 1 -> boggle_scoring_multi lst
-      | 2 -> wordhunt_scoring_multi lst
+      | 1 -> (boggle_scoring_multi lst, 1)
+      | 2 -> (wordhunt_scoring_multi lst, 2)
       | _ ->
           ANSITerminal.(print_string [ red; Bold ] try_again);
           ANSITerminal.(print_string [ red; Blink ] ">> ");
@@ -272,7 +222,7 @@ and scoring_multi (input : int option) (lst : string list list) :
 and game_end_multi
     (input_board : board)
     (possible_words : string list)
-    (player_name_list : string list) : unit =
+    (player_name_list : string list) (time_length : int) : unit =
   let player_word_list = player_word_input player_name_list [] in
   let validated_word_list =
     List.map
@@ -287,9 +237,13 @@ and game_end_multi
        scoring and (2) for WordHunt scoring. ");
   ANSITerminal.(print_string [ green; Blink ] "\n>> ");
   let input = read_line () |> int_of_string_opt in
-  let score_list = scoring_multi input validated_word_list in
+  let (score_list, gamemode) = scoring_multi input validated_word_list in
   begin
     multi_score_print player_name_list score_list;
+    let game_name = if gamemode = 1 then "boggle" else "wordhunt" in
+    List.iter2
+      (fun x y-> write game_name x y input_board.dim time_length) 
+      player_name_list score_list;
     view_all_words possible_words;
     play_again player_name_list
   end
@@ -315,7 +269,7 @@ and ai_score_print
 and game_end_ai
   (input_board : board)
   (possible_words : string list)
-  (player_name_list : string list) : unit =
+  (player_name_list : string list) (time_length : int) : unit =
   ANSITerminal.(
     print_string [ green ]
       "Please enter the list of words that you found in the board. \
@@ -338,9 +292,12 @@ and game_end_ai
     scoring and (2) for WordHunt scoring. ");
   ANSITerminal.(print_string [ green; Blink ] "\n>> ");
   let input = read_line () |> int_of_string_opt in
-  let score_list = scoring_multi input lst in
+  let (score_list, gamemode) = scoring_multi input lst in
   begin
     ai_score_print player_name_list score_list;
+    let game_name = if gamemode = 1 then "boggle" else "wordhunt" in
+    write game_name (List.nth player_name_list 0) 
+      (List.nth score_list 0) input_board.dim time_length;
     view_all_words possible_words;
     play_again player_name_list
   end
@@ -392,17 +349,17 @@ and countdown
     if List.length player_name_list = 1 then
       game_end_single input_board
         (find_possible_words input_board)
-        (List.hd player_name_list)
+        (List.hd player_name_list) time_length
     else
       if List.mem (List.nth player_name_list 1) ["0";"1";"2";"3";"4";"5"]
         then
           game_end_ai input_board
             (find_possible_words input_board)
-            player_name_list
+            player_name_list time_length
         else
           game_end_multi input_board
             (find_possible_words input_board)
-            player_name_list
+            player_name_list time_length
   end
   else begin
     print_board input_board;
@@ -457,17 +414,113 @@ and choose_time (input : int option) : int =
    ANSITerminal.(print_string [ magenta; Bold ] welcome_ascii);
    ANSITerminal.(print_string [ cyan; Bold ] boggle_ascii2); () *)
 
-(* initializes game >>greet user >>ask for name >>ask for size of board
-   >>generates board *)
+
+
+and choose_play_view (input : int option) : int =
+  let try_again = "Invalid Input. Try Again\n" in
+  match input with
+  | None ->
+      ANSITerminal.(print_string [ red; Bold ] try_again);
+      ANSITerminal.(print_string [ red; Blink ] ">> ");
+      let new_input = read_line () |> int_of_string_opt in
+      choose_play_view new_input
+  | Some int -> (
+      match int with
+      | 1 -> 1
+      | 2 -> 2
+      | _ ->
+          ANSITerminal.(print_string [ red; Bold ] try_again);
+          ANSITerminal.(print_string [ red; Blink ] ">> ");
+          let new_input = read_line () |> int_of_string_opt in
+          choose_play_view new_input)
+
+and choose_view_option (input : int option) : int =
+  let try_again = "Invalid Input. Try Again\n" in
+  match input with
+  | None ->
+      ANSITerminal.(print_string [ red; Bold ] try_again);
+      ANSITerminal.(print_string [ red; Blink ] ">> ");
+      let new_input = read_line () |> int_of_string_opt in
+      choose_view_option new_input
+  | Some int -> (
+      match int with
+      | 1 -> 1
+      | 2 -> 2
+      | 3 -> 3
+      | 4 -> 4
+      | 5 -> 5
+      | 6 -> 6
+      | _ ->
+          ANSITerminal.(print_string [ red; Bold ] try_again);
+          ANSITerminal.(print_string [ red; Blink ] ">> ");
+          let new_input = read_line () |> int_of_string_opt in
+          choose_view_option new_input)
+
+and view_scores (view_mode : int) : unit =
+  match view_mode with
+  | 1 -> print_highscores "boggle";
+    ask_view ()
+  | 2 -> print_highscores "wordhunt";
+    ask_view ()
+  | 3 | 4 -> 
+    ANSITerminal.(
+      print_string [ green ] "Type the name of whom you would like the see \
+      the scores. \n");
+    ANSITerminal.(print_string [ green; Blink ] ">> ");
+    let name = read_line () in
+    if view_mode = 3 then 
+      (print_player "boggle" name;
+      ask_view ())
+    else
+      (print_player "wordhunt" name;
+      ask_view ())
+  | 5 -> play_game ();
+    ask_view ()
+  | 6 | _ -> ANSITerminal.(
+    print_string [ cyan ; Bold ] "GOODBYE! \n"); exit 0
+
 and main () =
+  ANSITerminal.(resize 120 45);
+  ANSITerminal.(print_string [ magenta; Bold ] welcome_ascii);
+  ANSITerminal.(print_string [ cyan; Bold ] boggle_ascii2);
+  ANSITerminal.(
+    print_string [ green ] "Would you like to (1) play the game or (2) \
+    view scores? Type a number. \n");
+  ANSITerminal.(print_string [ green; Blink ] ">> ");
+  let input = read_line () |> int_of_string_opt in
+  let play_view = choose_play_view input in
+  if play_view = 1 then
+    play_game ()
+  else
+    ANSITerminal.(erase Screen);
+    ask_view ()
+
+
+and ask_view () = 
+  ANSITerminal.(
+    print_string [ green ] "Enter (1) if you would like to view all time \
+      boggle classic high scores (4 x 4). \n\
+      Enter (2) if you would like to view all time word hunt \
+        high scores (4 x 4). \n\
+      Enter (3) if you would like to search for a player’s boggle scores.\n\
+      Enter (4) if you would like to search for a player’s word hunt \
+        scores.\n\
+      Enter (5) if you would like to play.\n\
+      Enter (6) if you would like to leave.\n");
+    ANSITerminal.(print_string [ green; Blink ] ">> ");
+    let input = read_line () |> int_of_string_opt in
+    let view_mode = choose_view_option input in
+    view_scores view_mode
+    
+and play_game () =
   (* let _ = ascii_intro in *)
   (* if singleplayer, it's a length 1 list with the player name *)
-  let player_name_list = terminal_player_name in
+  let player_name_list = terminal_player_name () in
   ANSITerminal.(
     print_string [ green ]
       "How large would you like your board to be? Provide a \
-       side-length between 4 and 10.");
-  ANSITerminal.(print_string [ green; Blink ] "\n>> ");
+       side-length between 4 and 10.\n");
+  ANSITerminal.(print_string [ green; Blink ] ">> ");
   let input = read_line () |> int_of_string_opt in
   let board_size = choose_board_size input in
   let get_board dim =
@@ -487,6 +540,55 @@ and main () =
     print_string [ green ] (String.concat " " player_name_list));
   (* print_board new_board; *)
   countdown new_board time_input curr_time player_name_list
+
+and terminal_player_name () : string list =
+  ANSITerminal.(
+    print_string [ green ]
+      "\n\
+       How would you like to play? Type (1) for Singleplayer, (2) \
+       for Multiplayer, or \n(3) to play against the computer.\n");
+  ANSITerminal.(print_string [ green; Blink ] ">> ");
+  let input = read_line () |> int_of_string_opt in
+  let game_mode = choose_game_mode input in
+  match game_mode with
+  | 1 -> (
+    ANSITerminal.(
+      print_string [ green ]
+        "What is your name? Use the same name if you've played \
+         previously.\n");
+    ANSITerminal.(print_string [ green; Blink ] ">> ");
+    let input = read_line () |> name_process in
+    [ input ])
+  | 2 -> (
+    ANSITerminal.(
+      print_string [ green ]
+        "Please type all the names of the players into the same line, \
+         separated by spaces. Use the same names if you've played \
+         previously. \n");
+    ANSITerminal.(print_string [ green; Blink ] ">> ");
+    let input = read_line () 
+      |> String.split_on_char ' ' |> name_process_list in
+    input)
+  | 3 | _ -> 
+    (ANSITerminal.(
+    print_string [ green ]
+      "What is your name? Use the same name if you've played \
+       previously.\n");
+    ANSITerminal.(print_string [ green; Blink ] ">> ");
+    let name_input = read_line () |> name_process in
+    ANSITerminal.(
+    print_string [ green ]
+      "What difficulty would you like the computer to be? \n\
+      (0) for EASY\n\
+      (1) for NOVICE\n\
+      (2) for MEDIUM\n\
+      (3) for HARD\n\
+      (4) for INSANE\n\
+      (5) for IMPOSSIBLE\n");
+    ANSITerminal.(print_string [ green; Blink ] ">> ");
+    let input = read_line () |> int_of_string_opt in
+    let diff_input = choose_difficulty input in
+    [name_input; Int.to_string diff_input])
 
 (* launches game *)
 let () = main ()

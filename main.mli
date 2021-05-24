@@ -37,12 +37,12 @@ val choose_difficulty : int option -> int
 (** queries users to choose the game mode, and accordingly creates a string list
 that either contains the single player's name, multiple players' names,
 or a single player and a computer player's difficulty *)
-val terminal_player_name : string list
+val terminal_player_name : unit -> string list
 
 (** takes in [input] int option and string [lst] of player-found words, and 
 ensures the player provides valid input for how to score (either 1 or 2)
 and then returns the score accordingly as an integer *)
-val scoring_single : int option -> string list -> int
+val scoring_single : int option -> string list -> int * int
 
 (** queries the player(s) if they wish to play again and accordingly ends the 
    game or restarts from beginning *)
@@ -55,7 +55,7 @@ val view_all_words : string list -> unit
 (** prompts user for list of words, as well as scoring method. then, prints score
 and calls view_all_words and play again functionalities. takes in [input_board],
 [possible_words] for scoring, and the [player_name]*)
-val game_end_single : board -> string list -> string -> unit
+val game_end_single : board -> string list -> string -> int -> unit
 
 (** for each player in the [player_name_list], queries for the words found of
 that player and accumulates this into a list of string lists*)
@@ -69,13 +69,13 @@ val multi_score_print : string list -> int list -> unit
 , and ensures the players provides valid input for how to score (either 1 or 2)
 and then returns the score accordingly as an int list to match the player
 word list *)
-val scoring_multi : int option -> string list list -> int list
+val scoring_multi : int option -> string list list -> int list * int
 
 (** prompts players for their lists of words, as well as scoring method. 
 then, prints score and calls view_all_words and play again functionalities. 
 takes in [input_board], [possible_words] for scoring, and the [player_name_list]
 *)
-val game_end_multi : board -> string list -> string list -> unit
+val game_end_multi : board -> string list -> string list -> int -> unit
 
 (** given a player and a computer player in [player_name_list] and their scores
 in [score_list], prints out their scores and responds if the player has been
@@ -86,7 +86,7 @@ val ai_score_print : string list -> int list -> unit
 and calls view_all_words and play again functionalities. congratulates player
 if the AI is beaten, consoles otherwise. takes in [input_board],
 [possible_words] for scoring, and the [player_name]*)
-val game_end_ai : board -> string list -> string list -> unit
+val game_end_ai : board -> string list -> string list -> int -> unit
 
 (** recursive function to countdown and show clock ticking animation and the 
 [input_board] to the player. once the specified second limit is reached as 
@@ -103,6 +103,13 @@ val choose_board_size : int option -> int
 time length; makes sure length is less than 10000 seconds and is not neg. *)
 val choose_time : int option -> int
 
-(** main function that welcomes player, queries player for game mode, board 
-dimensions, game length, and initializes the countdown *)
+
+val ask_view : unit -> unit
+
+(* queries player(s) for name / gamemode, board size, round length and 
+initiates countdown *)
+val play : unit -> unit 
+
+(** main function that welcomes player, asks player to either view scores or
+play game*)
 val main : unit -> unit
