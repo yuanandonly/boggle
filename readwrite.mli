@@ -21,6 +21,12 @@ val read : string -> string list
       in [str_entries] is not an entry*)
 val convert : string list -> entry list
 
+(** [get_entries gm] creates an list of entries of all singleplayer
+    games played with gamemode [gm]
+
+    - Raises "Not a gamemode" if [gm] is neither "boggle" or "wordhunt" *)
+val get_entries : string -> entry list
+
 (** [write gm n s bs t] writes an entry with name [n], score [s],
     boardsize [bs], and length of time [t] into a file corresponding to
     gamemode [gm]*)
