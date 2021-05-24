@@ -14,6 +14,12 @@ val clear : string
 
 val choose_game_mode : int option -> int
 
+val name_process : string -> string
+
+val name_process_list : string list -> string list
+
+val choose_difficulty : int option -> int
+
 val terminal_player_name : string list
 
 val scoring_single : int option -> string list -> int
@@ -32,9 +38,11 @@ val multi_score_print : string list -> int list -> unit
 
 val scoring_multi : int option -> string list list -> int list
 
-val player_word_input : string list -> string list list -> string list list
-
 val game_end_multi : board -> string list -> string list -> unit
+
+val ai_score_print : string list -> int list -> unit
+
+val game_end_ai : board -> string list -> string list -> unit
 
 val countdown : board -> int -> float -> string list -> unit
 
