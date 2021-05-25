@@ -114,7 +114,7 @@ let rec play_again (player_name_list : string list) : unit =
       main ()
   | _ ->
       ANSITerminal.(print_string [ cyan; Bold ] "GOODBYE! \n");
-      ()
+      exit 0
 
 and view_all_words (possible_words : string list) : unit =
   ANSITerminal.(
