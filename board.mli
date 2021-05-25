@@ -41,5 +41,6 @@ val ( +++ ) : int -> int -> int list
     that index represents the board indices of the adjacent tiles *)
 val adj_table : int -> int list array
 
-(** [print_board t] produces a graphical representation of board [t]. *)
+(** [print_board t] produces a graphical representation of board [t].
+    Requires Dim > 0 *)
 val print_board : board -> unit

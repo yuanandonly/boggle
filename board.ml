@@ -7,10 +7,6 @@ type die = { letters : string list }
 
 let _ = Random.self_init ()
 
-(* should make it so you never get the same board but right now it looks
-   like every first time I initialize this file and create a 4x4 classic
-   board I get the same letters*)
-
 let roll (d : die) : string =
   let face = Random.int 6 in
   List.nth d.letters face
@@ -86,8 +82,7 @@ let manual_init (size : int) (letters : string) : board =
 let rand_init (size : int) =
   let rand_letter () = 25 |> Random.int |> List.nth dice5 |> roll in
   let rec loop i acc =
-    if i = size * size then acc
-    else loop (i + 1) (rand_letter () :: acc)
+    if i = size * size then acc else loop (i + 1) (rand_letter () :: acc)
   in
   { dim = size; board_letters = loop 0 [] }
 
@@ -131,13 +126,10 @@ let adj_table (x : int) : int list array =
   done;
   arr
 
-(** Requires: t.dim > 0 *)
 let print_board t =
-  (* frame_loop used to generate strings for the frame *)
   let rec frame_loop str i acc =
     if i = t.dim then acc ^ "|" else frame_loop str (i + 1) (acc ^ str)
   in
-  (* letter_loop used to generate strings for lines with letters*)
   let rec letter_loop start i acc =
     if i = t.dim then acc ^ "|"
     else

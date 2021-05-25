@@ -118,14 +118,14 @@ val choose_play_view : int option -> int
     size *)
 val choose_view_option : int option -> int
 
-(* matches player choice to view scores to appropriate actions *)
+(** matches player choice to view scores to appropriate actions *)
 val view_scores : int -> unit
 
-(* presents score viewing options to player *)
+(** presents score viewing options to player *)
 val ask_view : unit -> unit
 
-(* queries player(s) for name / gamemode, board size, round length and
-   initiates countdown *)
+(** queries player(s) for name / gamemode, board size, round length and
+    initiates countdown *)
 val play_game : unit -> unit
 
 (** main function that welcomes player, asks player to either view
