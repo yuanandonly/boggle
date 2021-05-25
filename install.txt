@@ -3,9 +3,6 @@ from CMS. The system was constructed with the basic version of
 OCaml initially installed for this class, so downloading any 
 additional OPAM packages won't be needed. 
 
-Since the last milestone, we created a Makefile. We are still ironing out
-some issues, but the basic functionality of playing the game is there. 
-
-Run "make play" to play our boggle game. At the time of submission, only 
-the 4x4 size board words, so when queried, please return 4 as the board 
-dimension (that functionality should be working by demo.)
+Run "make play" to play our boggle game. The game will prompt you 
+for various inputs, and reprompt you if the input is invalid. Follow
+the instructions in the terminal to play the game. 
