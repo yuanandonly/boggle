@@ -12,14 +12,6 @@ let printlist l = List.iter (Printf.printf "%s ") l
 
 let printllist l = List.iter (fun ll -> printlist ll) l
 
-let validate_words
-    (word_list : string list)
-    (possible_words : string list) : string list =
-  List.filter
-    (fun (x : string) ->
-      List.mem (String.uppercase_ascii x) possible_words)
-    word_list
-
 let rec repeat (s : string) (n : int) : string =
   if n = 0 then "" else s ^ repeat s (n - 1)
 
@@ -234,7 +226,6 @@ and game_end_multi
   let validated_word_list =
     List.map (fun x -> validate_words x possible_words) player_word_list
   in
-  (* printllist player_word_list; printllist validated_word_list; *)
   ANSITerminal.(
     print_string [ green ]
       "How would you like your words to be scored? Type (1) for Boggle \
@@ -293,7 +284,6 @@ and game_end_ai
       (int_of_string (List.nth player_name_list 1))
   in
   let lst = [ validated_word_list; ai_words ] in
-  (* printllist player_word_list; printllist validated_word_list; *)
   ANSITerminal.(
     print_string [ green ]
       "How would you like your words to be scored? Type (1) for Boggle \
@@ -309,23 +299,15 @@ and game_end_ai
   view_all_words possible_words;
   play_again player_name_list
 
-(* try let proc = Unix.open_process_in "clear" in try let chars =
-   input_line proc in ignore (Unix.close_process_in proc); chars with e
-   -> ignore (Unix.close_process_in proc); "" with _ -> "" *)
-
-(* takes in time, keeps counting down every sec (or 5?) to terminal +
-   erasing?? and then printing times up, then calling game end*)
 and countdown
     (input_board : board)
     (time_length : int)
     (time_start : float)
     (player_name_list : string list) : unit =
   ANSITerminal.(resize 120 45);
-  (* (print_board input_board); *)
+
   let time_passed = Unix.gettimeofday () -. time_start in
-  (* let _ = ANSITerminal.(print_string [green; Bold] ("\n" ^
-     (time_passed |> Float.to_int |> string_of_int) ^ "seconds passed
-     out of " ^ (time_length |> string_of_int) ^ "seconds \n")) in *)
+
   let _ =
     let step = Float.to_int (2. *. time_passed) mod 8 in
     match step with
@@ -373,7 +355,7 @@ and countdown
   end
   else begin
     print_board input_board;
-    (* print_endline ""; *)
+
     ANSITerminal.(
       print_string [ cyan; Bold ]
         ("\n"
@@ -384,7 +366,7 @@ and countdown
     print_endline "";
     Unix.sleepf 0.1;
     ANSITerminal.(print_string [ white ] clear);
-    (* ANSITerminal.(erase Above); *)
+
     countdown input_board time_length time_start player_name_list
   end
 
@@ -420,9 +402,6 @@ and choose_time (input : int option) : int =
         let new_input = read_line () |> int_of_string_opt in
         choose_time new_input)
 
-(* let ascii_intro = ANSITerminal.(resize 120 45);
-   ANSITerminal.(print_string [ magenta; Bold ] welcome_ascii);
-   ANSITerminal.(print_string [ cyan; Bold ] boggle_ascii2); () *)
 and choose_play_view (input : int option) : int =
   let try_again = "Invalid Input. Try Again\n" in
   match input with
@@ -501,8 +480,9 @@ and main () =
   ANSITerminal.(print_string [ green; Blink ] ">> ");
   let input = read_line () |> int_of_string_opt in
   let play_view = choose_play_view input in
-  if play_view = 1 then play_game () 
-  else (ANSITerminal.(erase Screen);
+  if play_view = 1 then play_game ()
+  else (
+    ANSITerminal.(erase Screen);
     ask_view ())
 
 and ask_view () =
@@ -524,8 +504,6 @@ and ask_view () =
   view_scores view_mode
 
 and play_game () =
-  (* let _ = ascii_intro in *)
-  (* if singleplayer, it's a length 1 list with the player name *)
   let player_name_list = terminal_player_name () in
   ANSITerminal.(
     print_string [ green ]
@@ -549,7 +527,6 @@ and play_game () =
   let curr_time = Unix.gettimeofday () in
   ANSITerminal.(
     print_string [ green ] (String.concat " " player_name_list));
-  (* print_board new_board; *)
   countdown new_board time_input curr_time player_name_list
 
 and terminal_player_name () : string list =
@@ -603,5 +580,4 @@ and terminal_player_name () : string list =
       let diff_input = choose_difficulty input in
       [ name_input; Int.to_string diff_input ]
 
-(* launches game *)
 let () = main ()

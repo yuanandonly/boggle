@@ -118,15 +118,3 @@ let trie_instantiate (words : string list) : t =
   List.fold_left
     (fun acc (word : string) -> trie_insert acc (word_to_list word))
     (empty ()) words
-
-let new_word = "NEW"
-
-let string_list_1 = [ "RICHARD"; "EMILY"; "JACK" ]
-
-let string_list_2 = [ "JACK"; "CHRIS" ]
-
-let empty_trie = empty ()
-
-let trie_1 = trie_instantiate string_list_1
-
-let trie_2 = trie_instantiate string_list_2

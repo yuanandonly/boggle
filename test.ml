@@ -1,18 +1,39 @@
 open OUnit2
-open Main
 open Board
 open Trie
 open Words
 open Score
 open Ai_player
 
-(********************************************************************
-Hi Tony! To conduct our testing, we used 
- ********************************************************************)
+(* For our testing approach, we tried our best to implement Test Driven
+   Development throughout our coding cycle. Compared to other labs, this
+   final project of creating a well polished Boggle game was a much
+   bigger challenge than anything else; it is a machine with much more
+   moving pieces and “cogs” than what we’ve worked with previously. That
+   is, because we are building our project from the ground up instead of
+   simply working on a couple components of a large system in a lab, we
+   cannot assume any module automatically works and has been thoroughly
+   tested by staff. Thus, we took extra effort to anticipate edge cases
+   for methods as we wrote them. It was important that we tested as we
+   coded each method and module, lest there be cascading errors that
+   carry through our system.
 
-(********************************************************************
-   Here are some helper functions for your testing of set-like lists. 
- ********************************************************************)
+   In our testing suite, we tested all the modules that were able to be
+   tested through our OUnit Suite. We used a glass box approach for
+   every function that didn’t involve a randomly generated item and
+   opted for black box testing for random functions like the generation
+   of a random boggle board. Helper functions were not tested. User
+   experience in terminal was tested manually, as were most of functions
+   in files like main.ml.
+
+   We combined our OUnit testing with user testing of the game itself as
+   we added features with each sprint. For instance, we’d input an
+   invalid number (negative seconds, for instance) to see if the game
+   would respond accordingly by prompting for a new input. We also asked
+   friends not in the class to play the game to ensure it was
+   user-friendly for non-coders. With our comprehensive testing suite
+   and a great deal of hands-on testing, we believe that our testing
+   approach demonstrates the correctness of our system. *)
 
 (** [cmp_set_like_lists lst1 lst2] compares two lists to see whether
     they are equivalent set-like lists. That means checking two things.
@@ -56,6 +77,26 @@ let find_possible_words_test
     (cmp_set_like_lists (find_possible_words input_board) ans)
     true
 
+let validate_words_test
+    (name : string)
+    (word_list : string list)
+    (possible_words : string list)
+    (ans : string list) =
+  name >:: fun _ ->
+  assert_equal (validate_words word_list possible_words) ans
+
+let word_list_empty = []
+
+let word_list_1 = [ "CHRIS"; "JACK"; "EMILY"; "RICHARD" ]
+
+let word_list_2 = [ "chris"; "jack"; "emily"; "richard" ]
+
+let word_list_3 = [ "Chris"; "Jack"; "Emily"; "Richard" ]
+
+let word_list_4 = [ "RICHARD"; "JACK"; "EMILY" ]
+
+let possible_words_list = [ "CHRIS"; "RICHARD" ]
+
 let board_1 : board =
   {
     dim = 3;
@@ -79,7 +120,6 @@ let board_4 : board =
     board_letters = [ "B"; "C"; "D"; "F"; "G"; "Z"; "J"; "K"; "L" ];
   }
 
-(*Test*)
 let board_5 : board =
   {
     dim = 3;
@@ -384,29 +424,6 @@ let word_multi_list_1 = [ word_single_list_1; word_single_list_2 ]
 let word_multi_list_2 = [ word_single_list_1; word_single_list_3 ]
 
 (********************************************************************
-   Main Helper Functions.
- ********************************************************************)
-let validate_words_test
-    (name : string)
-    (word_list : string list)
-    (possible_words : string list)
-    (ans : string list) =
-  name >:: fun _ ->
-  assert_equal (validate_words word_list possible_words) ans
-
-let word_list_empty = []
-
-let word_list_1 = [ "CHRIS"; "JACK"; "EMILY"; "RICHARD" ]
-
-let word_list_2 = [ "chris"; "jack"; "emily"; "richard" ]
-
-let word_list_3 = [ "Chris"; "Jack"; "Emily"; "Richard" ]
-
-let word_list_4 = [ "RICHARD"; "JACK"; "EMILY" ]
-
-let possible_words_list = [ "CHRIS"; "RICHARD" ]
-
-(********************************************************************
    AI-Players Helper Functions.
  ********************************************************************)
 let length_filter_test
@@ -466,6 +483,28 @@ let words_tests =
       board_6 ans_6;
     find_possible_words_test "Testing a 4x4 TONY BOARD" tony's_board
       tony's_board_ans;
+    validate_words_test
+      "Tests an empty word list against the list of possible words.  \
+       Should return no valid word list"
+      word_list_empty possible_words_list [];
+    validate_words_test
+      "Tests an full uppercase word list against the list of possible \
+       words. Should return the words in possible word list"
+      word_list_1 possible_words_list [ "CHRIS"; "RICHARD" ];
+    validate_words_test
+      "Tests an full lowercase word list against the list of possible \
+       words. Should return the words in possible word list"
+      word_list_2 possible_words_list [ "chris"; "richard" ];
+    validate_words_test
+      "Tests an mix of lower and uppercase word list against the list \
+       of possible words. Should return the words in possible word \
+       list"
+      word_list_3 possible_words_list [ "Chris"; "Richard" ];
+    validate_words_test
+      "Tests a word list that has some words contained in the possible \
+       word list against the list of possible words. Should return the \
+       words in possible word list"
+      word_list_4 possible_words_list [ "RICHARD" ];
   ]
 
 let board_tests =
@@ -616,32 +655,6 @@ let score_tests =
       word_multi_list_2 [ 12; 0 ];
   ]
 
-let main_tests =
-  [
-    validate_words_test
-      "Tests an empty word list against the list of possible words. \
-       Should return no valid word list"
-      word_list_empty possible_words_list [];
-    validate_words_test
-      "Tests an full uppercase word list against the list of possible \
-       words. Should return the words in possible word list"
-      word_list_1 possible_words_list [ "CHRIS"; "RICHARD" ];
-    validate_words_test
-      "Tests an full lowercase word list against the list of possible \
-       words. Should return the words in possible word list"
-      word_list_2 possible_words_list [ "chris"; "richard" ];
-    validate_words_test
-      "Tests an mix of lower and uppercase word list against the list \
-       of possible words. Should return the words in possible word \
-       list"
-      word_list_3 possible_words_list [ "Chris"; "Richard" ];
-    validate_words_test
-      "Tests a word list that has some words contained in the possible \
-       word list against the list of possible words. Should return the \
-       words in possible word list"
-      word_list_4 possible_words_list [ "RICHARD" ];
-  ]
-
 let ai_player_tests =
   [
     length_filter_test
@@ -674,7 +687,6 @@ let suite =
            board_tests;
            trie_tests;
            score_tests;
-           main_tests;
            ai_player_tests;
          ]
 

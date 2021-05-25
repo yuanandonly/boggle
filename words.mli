@@ -64,3 +64,8 @@ val fold_left_ind :
 (** finds all possible words that exist inside a given Boggle board.
     Returns a string list of unique words. *)
 val find_possible_words : board -> string list
+
+(** given a [word_list] string list, filters through and removes all
+    words that are not in [possible_words] and therefore cannot be found
+    from given board *)
+val validate_words : string list -> string list -> string list

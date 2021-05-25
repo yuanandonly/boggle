@@ -104,7 +104,13 @@ let find_possible_words (input_board : board) : string list =
   in
   List.sort_uniq compare with_duplicates
 
-(* TODO lookup table for letters <=> indices of board instead of passing *)
+let validate_words
+    (word_list : string list)
+    (possible_words : string list) : string list =
+  List.filter
+    (fun (x : string) ->
+      List.mem (String.uppercase_ascii x) possible_words)
+    word_list
 
 let ex_board : board =
   {
