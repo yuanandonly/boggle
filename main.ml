@@ -462,9 +462,7 @@ and view_scores (view_mode : int) : unit =
       else (
         print_player "wordhunt" name;
         ask_view ())
-  | 5 ->
-      play_game ();
-      ask_view ()
+  | 5 -> play_game ()
   | 6 | _ ->
       ANSITerminal.(print_string [ cyan; Bold ] "GOODBYE! \n");
       exit 0
