@@ -49,8 +49,7 @@ let rec dice_randomizer (acc : int list) (count : int) (dim : int) =
       if not (List.mem x acc) then x
       else find_num ((x + 1) mod (dim * dim))
     in
-    dice_randomizer
-      ((dim * dim |> Random.int |> find_num) :: acc)
+    dice_randomizer ((dim * dim |> Random.int |> find_num) :: acc)
       (count - 1) dim
 
 let init_classic (dim : int) =

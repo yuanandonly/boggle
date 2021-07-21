@@ -22,7 +22,8 @@ let return_child_opt (children : (string * t) list) (stem : string) :
     t option =
   let compare_char stem (pair : string * t) : bool = fst pair = stem in
   let result = List.find_opt (compare_char stem) children in
-  if result = None then None else Some (snd (extract_st_option result))
+  if result = None then None 
+  else Some (snd (extract_st_option result))
 
 let rec trie_insert (trie : t) (key : string list) : t =
   let (Node (is_word, children)) = trie in

@@ -1,5 +1,6 @@
 (** Representation of the Boggle game board.
 
+
     This module represents the static board that Boggle is played on. *)
 
 (** [board] is a board representing the game state. *)

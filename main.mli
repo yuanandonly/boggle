@@ -1,6 +1,5 @@
 (** Runs the game. *)
 open Board
-
 open Trie
 
 (** iterates through list [l] and prints each string *)

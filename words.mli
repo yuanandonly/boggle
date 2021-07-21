@@ -1,6 +1,5 @@
 (** Implements word identification. *)
 open Trie
-
 open Board
 
 (** Converts [corpus.txt] into a readable string *)
